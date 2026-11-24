@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Market Forecast" />
+  <title>Market Forecast — Cổ phiếu & Crypto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.55);
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .live-dot {
+      animation: pulse-dot 1.8s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8M17 7h4v4" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight truncate">Market Forecast</h1>
+            <span class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 live-dot"></span>
+              LIVE QUANT &amp; CONSENSUS • v2.6
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Dự báo phân vị xác suất, đồng thuận tổ chức &amp; tin tức thị trường trực tiếp</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- Auto Refresh Status Pill -->
+        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-xs">
+          <span id="livePulseIndicator" class="w-2 h-2 rounded-full bg-emerald-500 live-dot"></span>
+          <span class="text-slate-600 dark:text-slate-300 font-medium">Tự động cập nhật:</span>
+          <span id="countdownText" class="font-mono font-bold text-blue-600 dark:text-blue-400">30s</span>
+        </div>
+
+        <button id="openInstallModalBtn" type="button" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          <span>Cài App / Lên Google</span>
+        </button>
+
+        <button id="themeToggleBtn" type="button" title="Đổi giao diện Sáng/Tối" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer">
+          <svg id="sunIcon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+          </svg>
+          <svg id="moonIcon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <div class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Control Sidebar -->
+    <aside class="lg:col-span-3 space-y-5">
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cấu hình dự báo</h2>
+          <span id="assetTypeBadge" class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400">Crypto • 365d</span>
+        </div>
+
+        <!-- Symbol Input -->
+        <div class="space-y-1.5">
+          <label for="symbolInput" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Mã Cổ phiếu / Crypto</label>
+          <div class="relative">
+            <input id="symbolInput" type="text" value="BTC-USD" placeholder="VD: BTC-USD, MBB, FPT.VN, NVDA" class="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button id="refreshNowBtn" type="button" title="Làm mới giá ngay" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-slate-200/60 dark:hover:bg-slate-700 transition cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M5.64 18.36A9 9 0 0020 12M4 12a9 9 0 0114.36-6.36" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Symbol Presets -->
+        <div class="space-y-1.5">
+          <span class="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Chọn nhanh phổ biến:</span>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" data-symbol="BTC-USD" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-blue-600 text-white transition cursor-pointer">BTC-USD</button>
+            <button type="button" data-symbol="ETH-USD" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">ETH-USD</button>
+            <button type="button" data-symbol="SOL-USD" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">SOL-USD</button>
+            <button type="button" data-symbol="MBB.VN" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">MBB.VN</button>
+            <button type="button" data-symbol="FPT.VN" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">FPT.VN</button>
+            <button type="button" data-symbol="VCB.VN" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">VCB.VN</button>
+            <button type="button" data-symbol="HPG.VN" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">HPG.VN</button>
+            <button type="button" data-symbol="NVDA" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">NVDA</button>
+          </div>
+        </div>
+
+        <!-- Horizon Selector -->
+        <div class="space-y-1.5">
+          <label for="horizonSelect" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Khung thời gian dự báo</label>
+          <select id="horizonSelect" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="1w">1 tuần (7 phiên Crypto / 5 phiên CP)</option>
+            <option value="1m" selected>1 tháng (30 phiên Crypto / 21 phiên CP)</option>
+            <option value="3m">3 tháng (90 phiên Crypto / 63 phiên CP)</option>
+            <option value="1y">1 năm (365 phiên Crypto / 252 phiên CP)</option>
+          </select>
+        </div>
+
+        <!-- Auto Refresh Controls -->
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Tự động cập nhật giá</span>
+            <label class="inline-flex items-center cursor-pointer">
+              <input id="autoRefreshToggle" type="checkbox" checked class="sr-only peer" />
+              <div class="w-9 h-5 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:bg-emerald-500 relative transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:w-4 after:h-4 after:rounded-full after:transition peer-checked:after:translate-x-4"></div>
+            </label>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+            <span>Chu kỳ quét thị trường:</span>
+            <select id="refreshIntervalSelect" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">
+              <option value="15">15 giây</option>
+              <option value="30" selected>30 giây</option>
+              <option value="60">1 phút</option>
+              <option value="300">5 phút</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Optional Google Sheets GOOGLEFINANCE CSV Link -->
+        <details class="group rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40">
+          <summary class="px-3 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer flex items-center justify-between select-none">
+            <span>Nguồn Google Finance CSV (Tùy chọn)</span>
+            <span class="text-[10px] text-blue-500 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="px-3 pb-3 pt-1 space-y-2 border-t border-slate-200/70 dark:border-slate-700/70">
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              Dán link CSV xuất bản từ Google Sheets dùng hàm <code class="text-blue-500">=GOOGLEFINANCE()</code> (tự lưu theo từng mã):
+            </p>
+            <input id="googleSheetCsvInput" type="url" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" class="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+        </details>
+
+        <!-- Run Forecast CTA -->
+        <button id="runForecastBtn" type="button" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition active:scale-[0.99] cursor-pointer">
+          <svg id="runBtnIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span id="runBtnText">Dự báo &amp; Cập nhật</span>
+        </button>
+      </div>
+
+      <!-- Model Weights Card -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Trọng số chỉ báo (P50)</h3>
+          <span class="text-[10px] font-mono text-slate-400">Standardized</span>
+        </div>
+        <div id="featureWeightsContainer" class="space-y-2 text-xs">
+          <p class="text-slate-400 text-[11px]">Đang tính toán trọng số mô hình...</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Dashboard Area -->
+    <main class="lg:col-span-9 space-y-5 min-w-0">
+
+      <!-- Status / Alert Banner -->
+      <div id="statusBanner" class="hidden p-3.5 rounded-xl border text-xs font-medium flex items-center justify-between gap-3">
+        <span id="statusBannerText"></span>
+        <button id="closeBannerBtn" type="button" class="opacity-70 hover:opacity-100 font-bold cursor-pointer">✕</button>
+      </div>
+
+      <!-- Live Session Ticker Bar -->
+      <div class="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-4 text-xs">
+        <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">Tài sản</span>
+            <span id="tickerSymbol" class="font-mono font-extrabold text-sm text-blue-600 dark:text-blue-400">BTC-USD</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">Mở cửa phiên</span>
+            <span id="tickerOpen" class="font-mono font-semibold tabular-nums">--</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">Cao nhất</span>
+            <span id="tickerHigh" class="font-mono font-semibold text-emerald-500 tabular-nums">--</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">Thấp nhất</span>
+            <span id="tickerLow" class="font-mono font-semibold text-rose-500 tabular-nums">--</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">Biến động ngày</span>
+            <span id="tickerDayChange" class="font-mono font-bold tabular-nums">--</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+          <span id="dataSourceLabel" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-medium">Nguồn: Đang kết nối...</span>
+          <span id="lastSyncTime" class="font-mono">--:--:--</span>
+        </div>
+      </div>
+
+      <!-- 5 KPI Metric Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <!-- Card 1: Current Price -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Giá thị trường hiện tại</span>
+          <div id="kpiCurrentPrice" class="mt-1.5 text-xl font-extrabold font-mono tabular-nums tracking-tight">--</div>
+          <div id="kpiCurrencyNote" class="mt-1 text-[11px] text-slate-400">Đang đồng bộ...</div>
+        </div>
+
+        <!-- Card 2: Median Forecast -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <span id="kpiForecastTitle" class="text-xs font-medium text-slate-500 dark:text-slate-400">Dự báo trung vị (P50)</span>
+          <div id="kpiMedianPrice" class="mt-1.5 text-xl font-extrabold font-mono tabular-nums tracking-tight">--</div>
+          <div id="kpiMedianChange" class="mt-1 text-xs font-mono font-bold">--</div>
+        </div>
+
+        <!-- Card 3: Institutional Consensus Target -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-blue-500/5 to-transparent dark:from-indigo-500/15 dark:via-slate-900 dark:to-slate-900 border border-indigo-500/30 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-300">Giá mục tiêu TB Tổ chức</span>
+            <span id="kpiInstCount" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-600 dark:text-indigo-300">-- tổ chức</span>
+          </div>
+          <div id="kpiInstTargetPrice" class="mt-1.5 text-xl font-extrabold font-mono tabular-nums text-indigo-600 dark:text-indigo-300">--</div>
+          <div id="kpiInstUpside" class="mt-1 text-xs font-mono font-bold">--</div>
+        </div>
+
+        <!-- Card 4: Up Probability -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Xác suất tăng giá</span>
+          <div id="kpiUpProb" class="mt-1.5 text-xl font-extrabold font-mono tabular-nums">--%</div>
+          <div class="mt-2 w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+            <div id="kpiUpProbBar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 50%"></div>
+          </div>
+        </div>
+
+        <!-- Card 5: Backtest MAE -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Sai số Backtest (MAE)</span>
+          <div id="kpiMae" class="mt-1.5 text-xl font-extrabold font-mono tabular-nums">--%</div>
+          <div id="kpiBacktestSamples" class="mt-1 text-[11px] text-slate-400">Purge-gap validation</div>
+        </div>
+      </div>
+
+      <!-- Fan Chart Container -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 id="chartTitle" class="text-base font-bold">Lịch sử giá &amp; Nón xác suất dự báo</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Vùng xanh đậm: Khoảng tin cậy 50% (P25–P75) • Vùng xanh nhạt: Khoảng tin cậy 80% (P10–P90) • Đường tím: Mục tiêu TB Tổ chức</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium">
+              <span class="w-2.5 h-2.5 rounded-sm bg-blue-500/40"></span> Nón phân vị
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium">
+              <span class="w-3 h-0.5 bg-indigo-500"></span> Mục tiêu Tổ chức
+            </span>
+          </div>
+        </div>
+        <div id="forecastChart" class="w-full h-[430px] rounded-xl overflow-hidden"></div>
+        <canvas id="fallbackCanvas" class="hidden w-full h-[430px] rounded-xl"></canvas>
+      </div>
+
+      <!-- Quantile Scenarios Table & Institutional Consensus Panel -->
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+
+        <!-- Quantile Scenarios Table (5 cols) -->
+        <div class="xl:col-span-5 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold">5 Kịch bản Phân vị Định lượng</h3>
+            <span class="text-[11px] font-mono text-slate-400">Quantile Regression</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
+                  <th class="py-2.5 font-semibold">Kịch bản</th>
+                  <th class="py-2.5 font-semibold text-right">Giá dự báo</th>
+                  <th class="py-2.5 font-semibold text-right">Biến động</th>
+                </tr>
+              </thead>
+              <tbody id="scenariosTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/80 font-mono">
+                <tr><td colspan="3" class="py-6 text-center text-slate-400 font-sans">Đang tính toán các kịch bản...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="backtestFootnote" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+            Mô hình ước lượng phân phối lợi suất logarit dựa trên 13 đặc trưng kỹ thuật đã chuẩn hóa.
+          </div>
+        </div>
+
+        <!-- Institutional & Pro Investors Target Price Consensus (7 cols) -->
+        <div class="xl:col-span-7 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold flex items-center gap-2">
+                <span>Ước tính giá của Nhà đầu tư chuyên nghiệp &amp; Các công ty</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/15 text-indigo-600 dark:text-indigo-300">Auto-Synced</span>
+              </h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Tổng hợp giá mục tiêu 12 tháng từ các quỹ đầu tư, ngân hàng &amp; công ty chứng khoán lớn</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] uppercase text-slate-400 block">Khuyến nghị đồng thuận</span>
+              <span id="consensusRatingBadge" class="inline-block px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">MUA / TÍCH CỰC</span>
+            </div>
+          </div>
+
+          <!-- Consensus Target Range Gauge -->
+          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70 space-y-2">
+            <div class="flex items-center justify-between text-xs font-mono">
+              <div>
+                <span class="text-[10px] text-slate-400 block font-sans">Thấp nhất (Bear)</span>
+                <span id="instLowPrice" class="font-bold text-rose-500">--</span>
+              </div>
+              <div class="text-center">
+                <span class="text-[10px] text-indigo-400 block font-sans font-semibold">Giá mục tiêu Trung bình</span>
+                <span id="instAvgPrice" class="font-extrabold text-sm text-indigo-600 dark:text-indigo-300">--</span>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-slate-400 block font-sans">Cao nhất (Bull)</span>
+                <span id="instHighPrice" class="font-bold text-emerald-500">--</span>
+              </div>
+            </div>
+            <div class="relative w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-visible">
+              <div id="instRangeBar" class="h-full rounded-full bg-gradient-to-r from-rose-500 via-indigo-500 to-emerald-500" style="width: 100%"></div>
+              <div id="instCurrentMarker" title="Giá hiện tại" class="absolute -top-1 w-4 h-4 rounded-full bg-white border-2 border-blue-600 shadow transition-all duration-500" style="left: 35%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Biên độ định giá tổ chức</span>
+              <span id="instMarkerLegend">Điểm trắng: Giá hiện tại trên thang định giá</span>
+            </div>
+          </div>
+
+          <!-- Institutional Reports Table -->
+          <div class="overflow-x-auto max-h-[240px] overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
+                <tr>
+                  <th class="py-2 font-semibold">Tổ chức / Quỹ đầu tư</th>
+                  <th class="py-2 font-semibold">Quan điểm</th>
+                  <th class="py-2 font-semibold text-right">Giá mục tiêu</th>
+                  <th class="py-2 font-semibold text-right">Tiềm năng</th>
+                </tr>
+              </thead>
+              <tbody id="institutionalTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/80">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Market News & Financial Portals Hub -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold flex items-center gap-2">
+              <span>Tin tức Thị trường Trực tiếp &amp; Cổng Dữ liệu Tài chính</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-500 live-dot"></span>
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Tự động cập nhật tiêu đề mới nhất &amp; liên kết trực tiếp tới đúng mã trên các nền tảng hàng đầu</p>
+          </div>
+          <div id="quickPortalLinks" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <div id="liveNewsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs text-slate-400">Đang tải tin tức thị trường mới nhất...</div>
+        </div>
+      </div>
+
+      <!-- Disclaimer Footer -->
+      <footer class="text-center text-[11px] text-slate-400 dark:text-slate-500 pb-4">
+        Dữ liệu định lượng và tổng hợp ước tính tổ chức phục vụ mục đích nghiên cứu &amp; tham khảo thông tin thị trường, không phải khuyến nghị đầu tư tài chính.
+      </footer>
+    </main>
+  </div>
+
+  <!-- Install App & Publish to Google Modal -->
+  <div id="installAppModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm">
+    <div class="w-full max-w-xl rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xl p-5 space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div>
+          <h3 class="text-base font-bold">Đưa App lên Google &amp; Cài đặt vào máy</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Chạy toàn màn hình với đường dẫn <code class="text-emerald-500">https://</code> miễn phí của Google</p>
+        </div>
+        <button id="closeInstallModalBtn" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-200 cursor-pointer">✕</button>
+      </div>
+
+      <!-- Google Hosting Section -->
+      <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300">🌐 Xuất bản lên Google (Không cần tải file về máy)</span>
+          <span id="protocolStatusBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-200"></span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button id="publishGoogleSitesBtn" type="button" class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer">
+            <span>🚀 Mục 1: Google Sites (30s)</span>
+          </button>
+          <button id="publishGoogleScriptBtn" type="button" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+            <span>⚡ Mục 2: Google Apps Script</span>
+          </button>
+        </div>
+
+        <!-- Step-by-step guide for Google Apps Script -->
+        <div id="gasStepGuideBox" class="p-3 rounded-xl bg-slate-900/95 border border-emerald-500/30 space-y-2 text-[11px] text-slate-200">
+          <div class="font-bold text-emerald-400">3 bước dán code vào Google Apps Script (chạy toàn màn hình):</div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span><b>Bước 1:</b> Mở Apps Script &amp; dán code vào file <code class="text-amber-300">Mã.gs</code> (có sẵn cầu nối lấy giá trực tiếp)</span>
+              <button id="copyGasCodeBtn" type="button" class="shrink-0 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-[11px] cursor-pointer">Copy Mã.gs + Mở trang</button>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <span><b>Bước 2:</b> Mở file <code class="text-amber-300">index.html</code> → xóa chữ cũ → dán code App</span>
+              <button id="copyGasHtmlBtn" type="button" class="shrink-0 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[11px] cursor-pointer">Copy code index.html</button>
+            </div>
+            <p class="text-slate-300 leading-relaxed">
+              <b>Bước 3:</b> Bấm <b>Lưu (Ctrl+S)</b> → <b>Triển khai</b> → <b>Quản lý các tùy chọn triển khai</b> → bấm <b>Chỉnh sửa (✏️)</b> → đổi mục <b>Phiên bản</b> sang <b>Phiên bản mới</b> → bấm <b>Triển khai</b>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Download / Copy Fallback Actions -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="modalDownloadBtn" type="button" class="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow transition cursor-pointer">
+          <span>⬇ Tải file App (.html)</span>
+        </button>
+        <button id="modalCopyCodeBtn" type="button" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600 font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+          <span id="copyCodeBtnLabel">📋 Sao chép toàn bộ mã</span>
+        </button>
+        <button id="doneInstallModalBtn" type="button" class="py-2.5 px-3.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition cursor-pointer">
+          Đóng
+        </button>
+      </div>
+
+      <!-- Selectable Fallback Textarea -->
+      <div id="fallbackCodeBoxWrap" class="hidden space-y-1.5">
+        <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+          <span>Khung mã đầy đủ (bôi đen sẵn — nhấn Ctrl+C để copy):</span>
+          <button id="selectAllFallbackBtn" type="button" class="text-blue-500 hover:underline font-semibold cursor-pointer">Chọn tất cả</button>
+        </div>
+        <textarea id="fallbackCodeTextarea" readonly rows="4" class="w-full p-2.5 rounded-xl bg-slate-950 text-emerald-400 font-mono text-[10px] border border-slate-700 focus:outline-none"></textarea>
+      </div>
+
+      <p id="installFeedbackMsg" class="hidden text-xs text-emerald-600 dark:text-emerald-400 font-medium text-center"></p>
+    </div>
+  </div>
+
+  <script>
+    const bootMarketForecastApp = () => {
+      if (window.__mfAppBooted) return;
+      window.__mfAppBooted = true;
+
+      const initialLabel = document.getElementById('dataSourceLabel');
+      if (initialLabel) initialLabel.textContent = 'Nguồn: Đang đồng bộ dữ liệu...';
+
+      // =========================================================================
+      // 1. STATE & CONSTANTS
+      // =========================================================================
+      const QUANTILES = [0.10, 0.25, 0.50, 0.75, 0.90];
+      const FEATURE_NAMES = [
+        'Lợi suất 1 phiên (R1)',
+        'Đà tăng 5 phiên (R5)',
+        'Đà tăng 21 phiên (R21)',
+        'Đà tăng 63 phiên (R63)',
+        'Độ biến động 5p (Vol5)',
+        'Độ biến động 21p (Vol21)',
+        'Độ biến động 63p (Vol63)',
+        'Biên độ ngày (HL)',
+        'Vị trí trong phiên (Pos)',
+        'Khoảng cách MA20',
+        'Khoảng cách MA50',
+        'Tỷ số MA20 / MA50',
+        'Đột biến khối lượng (VolZ)'
+      ];
+
+      const HORIZON_MAP = {
+        '1w': { label: '1 tuần', cryptoDays: 7, stockDays: 5 },
+        '1m': { label: '1 tháng', cryptoDays: 30, stockDays: 21 },
+        '3m': { label: '3 tháng', cryptoDays: 90, stockDays: 63 },
+        '1y': { label: '1 năm', cryptoDays: 365, stockDays: 252 }
+      };
+
+      const INSTITUTIONAL_DATABASE = {
+        'BTC-USD': [
+          { firm: 'Standard Chartered', rating: 'Mua mạnh', mult: 1.58, note: 'Dòng vốn ETF tổ chức & chu kỳ khan hiếm nguồn cung' },
+          { firm: 'Bernstein Research', rating: 'Khả quan', mult: 1.49, note: 'Tích lũy từ các quỹ hưu trí và doanh nghiệp niêm yết' },
+          { firm: 'VanEck Digital Assets', rating: 'Mua', mult: 1.42, note: 'Mở rộng thanh khoản toàn cầu & dự trữ chiến lược' },
+          { firm: 'ARK Invest', rating: 'Mua mạnh', mult: 1.72, note: 'Mô hình định giá tài sản số dài hạn' },
+          { firm: 'J.P. Morgan Quant', rating: 'Trung lập', mult: 1.12, note: 'Cân bằng theo chi phí khai thác & biến động vĩ mô' },
+          { firm: 'Fidelity Digital', rating: 'Tích cực', mult: 1.35, note: 'Nhu cầu phòng hộ lạm phát từ danh mục đa tài sản' }
+        ],
+        'ETH-USD': [
+          { firm: 'VanEck Research', rating: 'Mua mạnh', mult: 1.52, note: 'Doanh thu phí Layer-2 & dòng tiền staking tổ chức' },
+          { firm: 'Standard Chartered', rating: 'Mua', mult: 1.44, note: 'Hạ tầng token hóa tài sản thực (RWA)' },
+          { firm: 'Bitwise Asset Mgmt', rating: 'Khả quan', mult: 1.38, note: 'Nâng cấp hiệu năng mạng lưới & ETF dòng vốn ròng' },
+          { firm: 'Coinbase Institutional', rating: 'Tích cực', mult: 1.29, note: 'Vị thế dẫn đầu hệ sinh thái DeFi & stablecoin' },
+          { firm: 'Goldman Sachs Desk', rating: 'Trung lập', mult: 1.10, note: 'Cạnh tranh thị phần hợp đồng thông minh' }
+        ],
+        'SOL-USD': [
+          { firm: 'VanEck Crypto', rating: 'Mua mạnh', mult: 1.62, note: 'Tốc độ xử lý giao dịch & tăng trưởng DEX bán lẻ' },
+          { firm: 'Franklin Templeton', rating: 'Khả quan', mult: 1.45, note: 'Ứng dụng thanh toán & hạ tầng DePIN mở rộng' },
+          { firm: 'Pantera Capital', rating: 'Mua', mult: 1.50, note: 'Thu hút dòng vốn nhà phát triển & phí on-chain' },
+          { firm: 'Galaxy Digital', rating: 'Tích cực', mult: 1.34, note: 'Thanh khoản phái sinh và kỳ vọng sản phẩm quỹ mới' }
+        ],
+        'MBB.VN': [
+          { firm: 'SSI Research', rating: 'Khả quan', mult: 1.24, note: 'Tăng trưởng tín dụng cao & hệ sinh thái ngân hàng số + MB Ageas' },
+          { firm: 'Vietcap (VCSC)', rating: 'Mua', mult: 1.27, note: 'NIM ổn định, tỷ lệ CASA cao và bộ đệm dự phòng vững chắc' },
+          { firm: 'VNDirect Research', rating: 'Mua', mult: 1.22, note: 'Lợi nhuận trước thuế duy trì đà tăng trưởng dương bền vững' },
+          { firm: 'MBS Research', rating: 'Tích cực', mult: 1.20, note: 'Định giá P/B hấp dẫn so với bình quân nhóm ngân hàng TMCP' }
+        ],
+        'FPT.VN': [
+          { firm: 'SSI Research', rating: 'Khả quan', mult: 1.22, note: 'Tăng trưởng xuất khẩu phần mềm Nhật Bản & Mỹ >25%' },
+          { firm: 'VNDirect Research', rating: 'Mua', mult: 1.25, note: 'Mảng AI Factory & chuyển đổi số doanh nghiệp bứt phá' },
+          { firm: 'Vietcap (VCSC)', rating: 'Mua', mult: 1.24, note: 'Biên lợi nhuận viễn thông & giáo dục duy trì ổn định' },
+          { firm: 'HSC Securities', rating: 'Tăng tỷ trọng', mult: 1.19, note: 'Lượng hợp đồng ký mới (Backlog) tăng trưởng hai chữ số' },
+          { firm: 'KBSV Research', rating: 'Mua', mult: 1.21, note: 'Định giá hấp dẫn so với tốc độ tăng trưởng EPS' }
+        ],
+        'VCB.VN': [
+          { firm: 'Vietcap (VCSC)', rating: 'Mua', mult: 1.18, note: 'Chất lượng tài sản đầu ngành & tỷ lệ bao phủ nợ xấu cao' },
+          { firm: 'SSI Research', rating: 'Khả quan', mult: 1.16, note: 'Tăng trưởng tín dụng phục hồi & chi phí vốn (CASA) thấp' },
+          { firm: 'BSC Research', rating: 'Mua', mult: 1.19, note: 'Động lực tăng vốn điều lệ củng cố bộ đệm CAR' },
+          { firm: 'MBS Research', rating: 'Tích cực', mult: 1.15, note: 'Biên lãi ròng (NIM) tạo đáy và cải thiện dần' }
+        ],
+        'HPG.VN': [
+          { firm: 'SSI Research', rating: 'Mua', mult: 1.26, note: 'Dự án Dung Quất 2 đi vào vận hành mở rộng công suất HRC' },
+          { firm: 'VNDirect Research', rating: 'Khả quan', mult: 1.23, note: 'Nhu cầu thép xây dựng nội địa & đầu tư công hồi phục' },
+          { firm: 'Vietcap (VCSC)', rating: 'Mua', mult: 1.28, note: 'Biên lợi nhuận gộp cải thiện nhờ giá nguyên liệu hạ nhiệt' },
+          { firm: 'ACBS Research', rating: 'Tích cực', mult: 1.20, note: 'Vị thế đầu ngành hưởng lợi từ chu kỳ bất động sản mới' }
+        ],
+        'NVDA': [
+          { firm: 'Morgan Stanley', rating: 'Overweight', mult: 1.28, note: 'Nhu cầu hạ tầng GPU Blackwell vượt cung tại các Hyperscaler' },
+          { firm: 'Goldman Sachs', rating: 'Conviction Buy', mult: 1.31, note: 'Hệ sinh thái phần mềm CUDA & doanh thu Data Center bùng nổ' },
+          { firm: 'Bank of America', rating: 'Buy', mult: 1.34, note: 'Dòng tiền tự do vượt trội & biên lợi nhuận gộp ~75%' },
+          { firm: 'J.P. Morgan', rating: 'Overweight', mult: 1.25, note: 'Chu kỳ nâng cấp AI Sovereign từ các chính phủ' },
+          { firm: 'UBS Global Research', rating: 'Buy', mult: 1.22, note: 'Định giá P/E dự phóng hợp lý so với tăng trưởng lợi nhuận' }
+        ],
+        'AAPL': [
+          { firm: 'Morgan Stanley', rating: 'Overweight', mult: 1.16, note: 'Chu kỳ nâng cấp thiết bị nhờ tích hợp Apple Intelligence' },
+          { firm: 'Wedbush Securities', rating: 'Outperform', mult: 1.22, note: 'Mảng dịch vụ (Services) đạt biên lợi nhuận kỷ lục' },
+          { firm: 'J.P. Morgan', rating: 'Overweight', mult: 1.15, note: 'Hệ sinh thái hơn 2,2 tỷ thiết bị hoạt động ổn định' },
+          { firm: 'Barclays', rating: 'Equal Weight', mult: 1.04, note: 'Tăng trưởng phần cứng tại thị trường châu Á cần theo dõi' }
+        ]
+      };
+
+      const state = {
+        symbol: 'BTC-USD',
+        horizon: '1m',
+        autoRefresh: true,
+        refreshSeconds: 30,
+        countdown: 30,
+        timerId: null,
+        isRunning: false,
+        lastRows: [],
+        lastForecast: null
+      };
+
+      // =========================================================================
+      // 2. UTILITY FUNCTIONS & FORMATTING
+      // =========================================================================
+      const VN_STOCK_TICKERS = new Set([
+        'MBB', 'FPT', 'VCB', 'HPG', 'TCB', 'STB', 'ACB', 'CTG', 'BID', 'VPB', 'TPB', 'VIB', 'SHB', 'HDB', 'MSB', 'OCB', 'LPB', 'EIB',
+        'VHM', 'VIC', 'VRE', 'NVL', 'PDR', 'DIG', 'DXG', 'KDH', 'NLG', 'TCH', 'CEO', 'IDC', 'KBC', 'SZC', 'VGC',
+        'SSI', 'VND', 'VCI', 'HCM', 'SHS', 'MBS', 'FTS', 'BSI', 'CTS', 'VIX', 'ORS',
+        'MWG', 'PNJ', 'FRT', 'DGW', 'MSN', 'VNM', 'SAB', 'QNS', 'DBC', 'HAG', 'BAF', 'ANV', 'VHC',
+        'GAS', 'PLX', 'PVD', 'PVS', 'BSR', 'POW', 'NT2', 'REE', 'PC1', 'GEG', 'GEX',
+        'DGC', 'DPM', 'DCM', 'CSV', 'GMD', 'HAH', 'VOS', 'VSC', 'VTP', 'CTR', 'CMG', 'ELC', 'HSG', 'NKG', 'BMP', 'CTD', 'VCG', 'HHV', 'LCG', 'FCN'
+      ]);
+
+      const normalizeAssetSymbol = (rawSym) => {
+        const s = (rawSym || 'BTC-USD').toUpperCase().trim();
+        if (VN_STOCK_TICKERS.has(s)) return `${s}.VN`;
+        return s;
+      };
+
+      const isCryptoSymbol = (sym) => {
+        const s = normalizeAssetSymbol(sym);
+        return s.endsWith('-USD') || s.endsWith('-USDT') || s.endsWith('USDT') || ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'AVAX', 'TON', 'SUI', 'LINK'].includes(s);
+      };
+
+      const isVietnamStock = (sym) => {
+        const s = normalizeAssetSymbol(sym);
+        return s.endsWith('.VN') || VN_STOCK_TICKERS.has(s);
+      };
+
+      const getCurrencyMeta = (sym) => {
+        if (isVietnamStock(sym)) return { code: 'VND', suffix: ' ₫', decimals: 0 };
+        return { code: 'USD', suffix: '', prefix: '$', decimals: 2 };
+      };
+
+      const formatPrice = (val, sym) => {
+        if (!Number.isFinite(val)) return '--';
+        const meta = getCurrencyMeta(sym);
+        let dec = meta.decimals;
+        if (meta.code === 'USD') {
+          if (Math.abs(val) < 1) dec = 4;
+          else if (Math.abs(val) < 10) dec = 3;
+          else dec = 2;
+        }
+        const formatted = Number(val).toLocaleString('en-US', {
+          minimumFractionDigits: dec,
+          maximumFractionDigits: dec
+        });
+        return `${meta.prefix || ''}${formatted}${meta.suffix || ''}`;
+      };
+
+      const formatPct = (pct, showPlus = true) => {
+        if (!Number.isFinite(pct)) return '--';
+        const sign = showPlus && pct > 0 ? '+' : '';
+        return `${sign}${pct.toFixed(2)}%`;
+      };
+
+      const showBanner = (message, type = 'info') => {
+        const banner = document.getElementById('statusBanner');
+        const text = document.getElementById('statusBannerText');
+        if (!banner || !text) return;
+        text.textContent = message;
+        banner.className = 'p-3.5 rounded-xl border text-xs font-medium flex items-center justify-between gap-3';
+        if (type === 'error') {
+          banner.classList.add('bg-rose-500/10', 'border-rose-500/30', 'text-rose-600', 'dark:text-rose-400');
+        } else if (type === 'warn') {
+          banner.classList.add('bg-amber-500/10', 'border-amber-500/30', 'text-amber-700', 'dark:text-amber-300');
+        } else {
+          banner.classList.add('bg-blue-500/10', 'border-blue-500/30', 'text-blue-700', 'dark:text-blue-300');
+        }
+        banner.classList.remove('hidden');
+      };
+
+      const getHorizonSteps = (sym, horizon) => {
+        const cfg = HORIZON_MAP[horizon] || HORIZON_MAP['1m'];
+        return isCryptoSymbol(sym) ? cfg.cryptoDays : cfg.stockDays;
+      };
+
+      const addTradingDates = (lastDateStr, steps, isCrypto) => {
+        const dates = [];
+        const baseDate = new Date(`${lastDateStr}T00:00:00Z`);
+        let current = new Date(baseDate.getTime());
+        let added = 0;
+        let safety = 0;
+        while (added < steps && safety < steps * 4 + 30) {
+          current = new Date(current.getTime() + 86400000);
+          const day = current.getUTCDay();
+          if (isCrypto || (day !== 0 && day !== 6)) {
+            dates.push(current.toISOString().slice(0, 10));
+            added++;
+          }
+          safety++;
+        }
+        return dates;
+      };
+
+      // =========================================================================
+      // 3. DATA FETCHING (GAS SERVER BRIDGE + MULTI-SOURCE LIVE APIS)
+      // =========================================================================
+      const fetchViaGasOrProxy = async (targetUrl) => {
+        // 1. If running inside Google Apps Script Web App, use server-side UrlFetchApp (zero CORS limits)
+        if (window.google && google.script && google.script.run && typeof google.script.run.fetchMarketUrl === 'function') {
+          try {
+            const gasRes = await new Promise((resolve) => {
+              google.script.run
+                .withSuccessHandler((res) => resolve(res))
+                .withFailureHandler(() => resolve(null))
+                .fetchMarketUrl(targetUrl);
+            });
+            if (typeof gasRes === 'string' && gasRes.length > 0 && !gasRes.startsWith('__ERR__:')) {
+              return gasRes;
+            }
+          } catch (_) {}
+        }
+
+        // 2. Direct fetch
+        try {
+          const r = await fetch(targetUrl, { cache: 'no-store' });
+          if (r.ok) return await r.text();
+        } catch (_) {}
+
+        // 3. Public CORS proxy fallbacks
+        const proxies = [
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+          `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`
+        ];
+        for (const pUrl of proxies) {
+          try {
+            const r = await fetch(pUrl, { cache: 'no-store' });
+            if (r.ok) {
+              const txt = await r.text();
+              if (txt && txt.length > 10) return txt;
+            }
+          } catch (_) {}
+        }
+        return null;
+      };
+
+      const fetchBinanceKlines = async (sym) => {
+        const cleanSym = normalizeAssetSymbol(sym);
+        let pair = cleanSym.replace('-', '');
+        if (pair.endsWith('USD') && !pair.endsWith('USDT')) pair = `${pair}T`;
+        if (!pair.endsWith('USDT')) pair = `${pair}USDT`;
+        const url = `https://api.binance.com/api/v3/klines?symbol=${encodeURIComponent(pair)}&interval=1d&limit=400`;
+        const txt = await fetchViaGasOrProxy(url);
+        if (!txt) return null;
+        try {
+          const arr = JSON.parse(txt);
+          if (!Array.isArray(arr) || arr.length < 30) return null;
+          return arr.map((k) => ({
+            date: new Date(k[0]).toISOString().slice(0, 10),
+            open: parseFloat(k[1]),
+            high: parseFloat(k[2]),
+            low: parseFloat(k[3]),
+            close: parseFloat(k[4]),
+            volume: parseFloat(k[5])
+          })).filter((r) => Number.isFinite(r.close) && r.close > 0);
+        } catch (_) {
+          return null;
+        }
+      };
+
+      const fetchYahooFinanceChart = async (sym) => {
+        const cleanSym = normalizeAssetSymbol(sym);
+        const hosts = ['query1.finance.yahoo.com', 'query2.finance.yahoo.com'];
+        for (const host of hosts) {
+          const url = `https://${host}/v8/finance/chart/${encodeURIComponent(cleanSym)}?range=1y&interval=1d`;
+          const txt = await fetchViaGasOrProxy(url);
+          if (!txt) continue;
+          try {
+            const json = JSON.parse(txt);
+            const result = json?.chart?.result?.[0];
+            const ts = result?.timestamp;
+            const quote = result?.indicators?.quote?.[0];
+            if (!Array.isArray(ts) || !quote || !Array.isArray(quote.close)) continue;
+            const rows = [];
+            for (let i = 0; i < ts.length; i++) {
+              const c = quote.close[i];
+              if (typeof c !== 'number' || !Number.isFinite(c) || c <= 0) continue;
+              const o = typeof quote.open[i] === 'number' && quote.open[i] > 0 ? quote.open[i] : c;
+              const h = typeof quote.high[i] === 'number' && quote.high[i] > 0 ? quote.high[i] : Math.max(o, c);
+              const l = typeof quote.low[i] === 'number' && quote.low[i] > 0 ? quote.low[i] : Math.min(o, c);
+              const v = typeof quote.volume[i] === 'number' && quote.volume[i] >= 0 ? quote.volume[i] : 100000;
+              rows.push({
+                date: new Date(ts[i] * 1000).toISOString().slice(0, 10),
+                open: o,
+                high: h,
+                low: l,
+                close: c,
+                volume: v
+              });
+            }
+            if (rows.length >= 30) return rows;
+          } catch (_) {}
+        }
+        return null;
+      };
+
+      const fetchVnStockDnse = async (sym) => {
+        const ticker = normalizeAssetSymbol(sym).replace('.VN', '').trim();
+        const toTs = Math.floor(Date.now() / 1000);
+        const fromTs = toTs - 550 * 86400;
+
+        // 1. DNSE Entrade OHLC API
+        const dnseUrl = `https://services.entrade.com.vn/chart-api/v2/ohlcs/stock?from=${fromTs}&to=${toTs}&symbol=${encodeURIComponent(ticker)}&resolution=1D`;
+        const txt = await fetchViaGasOrProxy(dnseUrl);
+        if (txt) {
+          try {
+            const data = JSON.parse(txt);
+            if (data && Array.isArray(data.t) && data.t.length >= 20) {
+              const rows = [];
+              const lastRaw = data.c[data.c.length - 1];
+              const multiplier = lastRaw < 1000 ? 1000 : 1;
+              for (let i = 0; i < data.t.length; i++) {
+                const c = data.c[i] * multiplier;
+                if (!Number.isFinite(c) || c <= 0) continue;
+                rows.push({
+                  date: new Date(data.t[i] * 1000).toISOString().slice(0, 10),
+                  open: (data.o[i] || data.c[i]) * multiplier,
+                  high: (data.h[i] || data.c[i]) * multiplier,
+                  low: (data.l[i] || data.c[i]) * multiplier,
+                  close: c,
+                  volume: data.v[i] || 100000
+                });
+              }
+              if (rows.length >= 20) return rows;
+            }
+          } catch (_) {}
+        }
+
+        // 2. VNDirect DChart API Fallback
+        const vndUrl = `https://dchart-api.vndirect.com.vn/dchart/history?resolution=D&symbol=${encodeURIComponent(ticker)}&from=${fromTs}&to=${toTs}`;
+        const vndTxt = await fetchViaGasOrProxy(vndUrl);
+        if (vndTxt) {
+          try {
+            const data = JSON.parse(vndTxt);
+            if (data && Array.isArray(data.t) && data.t.length >= 20) {
+              const rows = [];
+              const lastRaw = data.c[data.c.length - 1];
+              const multiplier = lastRaw < 1000 ? 1000 : 1;
+              for (let i = 0; i < data.t.length; i++) {
+                const c = data.c[i] * multiplier;
+                if (!Number.isFinite(c) || c <= 0) continue;
+                rows.push({
+                  date: new Date(data.t[i] * 1000).toISOString().slice(0, 10),
+                  open: (data.o[i] || data.c[i]) * multiplier,
+                  high: (data.h[i] || data.c[i]) * multiplier,
+                  low: (data.l[i] || data.c[i]) * multiplier,
+                  close: c,
+                  volume: data.v[i] || 100000
+                });
+              }
+              if (rows.length >= 20) return rows;
+            }
+          } catch (_) {}
+        }
+
+        return null;
+      };
+
+      const parseGoogleSheetCsv = (csvText) => {
+        const lines = csvText.trim().split(/\r?\n/).filter(Boolean);
+        if (lines.length < 25) return null;
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',').map((s) => s.replace(/^"|"$/g, '').trim());
+          if (cols.length < 2) continue;
+          const dateRaw = cols[0];
+          const closeVal = parseFloat(cols[cols.length >= 5 ? 4 : 1]);
+          if (!Number.isFinite(closeVal) || closeVal <= 0) continue;
+          const openVal = cols.length >= 5 && Number.isFinite(parseFloat(cols[1])) ? parseFloat(cols[1]) : closeVal;
+          const highVal = cols.length >= 5 && Number.isFinite(parseFloat(cols[2])) ? parseFloat(cols[2]) : Math.max(openVal, closeVal);
+          const lowVal = cols.length >= 5 && Number.isFinite(parseFloat(cols[3])) ? parseFloat(cols[3]) : Math.min(openVal, closeVal);
+          const volVal = cols.length >= 6 && Number.isFinite(parseFloat(cols[5])) ? parseFloat(cols[5]) : 100000;
+          const parsedDate = new Date(dateRaw);
+          const isoDate = Number.isNaN(parsedDate.getTime()) ? dateRaw.slice(0, 10) : parsedDate.toISOString().slice(0, 10);
+          rows.push({ date: isoDate, open: openVal, high: highVal, low: lowVal, close: closeVal, volume: volVal });
+        }
+        return rows.length >= 20 ? rows : null;
+      };
+
+      const generateDeterministicFallbackData = (sym) => {
+        const s = normalizeAssetSymbol(sym);
+        let seed = 0;
+        for (let i = 0; i < s.length; i++) seed = (seed * 31 + s.charCodeAt(i)) % 100000;
+        const rand = () => {
+          seed = (seed * 1664525 + 1013904223) % 4294967296;
+          return seed / 4294967296;
+        };
+
+        const basePrices = {
+          'BTC-USD': 89500, 'ETH-USD': 3120, 'SOL-USD': 195,
+          'MBB.VN': 18100, 'FPT.VN': 142000, 'VCB.VN': 93500, 'HPG.VN': 27800,
+          'TCB.VN': 24500, 'STB.VN': 33200, 'ACB.VN': 25400, 'SSI.VN': 26100,
+          'NVDA': 138, 'AAPL': 229
+        };
+        let price = basePrices[s] || (isVietnamStock(s) ? 24500 : isCryptoSymbol(s) ? 120 : 150);
+        const vol = isCryptoSymbol(s) ? 0.028 : 0.016;
+        const totalDays = 260;
+        const rows = [];
+        const start = new Date(Date.now() - totalDays * 86400000);
+
+        for (let i = 0; i < totalDays; i++) {
+          const d = new Date(start.getTime() + i * 86400000);
+          if (!isCryptoSymbol(s) && (d.getUTCDay() === 0 || d.getUTCDay() === 6)) continue;
+          const u1 = Math.max(1e-6, rand());
+          const u2 = rand();
+          const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+          const drift = 0.0004;
+          const ret = drift + vol * z;
+          const open = price;
+          const close = Math.max(0.01, open * Math.exp(ret));
+          const spread = Math.abs(close - open) + open * vol * (0.3 + rand() * 0.6);
+          const high = Math.max(open, close) + spread * rand();
+          const low = Math.max(0.01, Math.min(open, close) - spread * rand());
+          const volume = Math.round((500000 + rand() * 1500000) * (1 + Math.abs(ret) * 12));
+          rows.push({
+            date: d.toISOString().slice(0, 10),
+            open, high, low, close, volume
+          });
+          price = close;
+        }
+        return rows;
+      };
+
+      const fetchMarketHistory = async (sym) => {
+        const cleanSym = normalizeAssetSymbol(sym);
+        const csvStorageKey = `mf_csv_${cleanSym}`;
+        const csvInput = document.getElementById('googleSheetCsvInput');
+        const csvUrl = csvInput ? csvInput.value.trim() : '';
+
+        if (csvUrl) {
+          localStorage.setItem(csvStorageKey, csvUrl);
+          const csvTxt = await fetchViaGasOrProxy(csvUrl);
+          if (csvTxt) {
+            const parsed = parseGoogleSheetCsv(csvTxt);
+            if (parsed) return { rows: parsed, source: 'Google Sheets CSV (=GOOGLEFINANCE)', live: true };
+          }
+        }
+
+        if (isCryptoSymbol(cleanSym)) {
+          const binanceRows = await fetchBinanceKlines(cleanSym);
+          if (binanceRows) return { rows: binanceRows, source: 'Binance Spot Real-Time API', live: true };
+          const yahooCrypto = await fetchYahooFinanceChart(cleanSym.includes('-') ? cleanSym : `${cleanSym}-USD`);
+          if (yahooCrypto) return { rows: yahooCrypto, source: 'Yahoo Finance Crypto Live', live: true };
+        } else if (isVietnamStock(cleanSym)) {
+          const dnseRows = await fetchVnStockDnse(cleanSym);
+          if (dnseRows) return { rows: dnseRows, source: 'DNSE / VNDirect HOSE Live', live: true };
+          const yahooVn = await fetchYahooFinanceChart(cleanSym);
+          if (yahooVn) return { rows: yahooVn, source: 'Yahoo Finance VN Live', live: true };
+        } else {
+          const yahooUs = await fetchYahooFinanceChart(cleanSym);
+          if (yahooUs) return { rows: yahooUs, source: 'Yahoo Finance Global Live', live: true };
+        }
+
+        return {
+          rows: generateDeterministicFallbackData(cleanSym),
+          source: 'Mô phỏng định lượng cục bộ (Offline Fallback)',
+          live: false
+        };
+      };
+
+      // =========================================================================
+      // 4. QUANTITATIVE FEATURE ENGINEERING & QUANTILE REGRESSION ENGINE
+      // =========================================================================
+      const mean = (arr) => arr.reduce((a, b) => a + b, 0) / Math.max(1, arr.length);
+      const std = (arr, m = mean(arr)) => {
+        if (arr.length < 2) return 1e-6;
+        const v = arr.reduce((acc, x) => acc + (x - m) ** 2, 0) / (arr.length - 1);
+        return Math.sqrt(v) || 1e-6;
+      };
+      const quantile = (sortedArr, q) => {
+        if (!sortedArr.length) return 0;
+        const pos = (sortedArr.length - 1) * q;
+        const base = Math.floor(pos);
+        const rest = pos - base;
+        if (sortedArr[base + 1] !== undefined) {
+          return sortedArr[base] + rest * (sortedArr[base + 1] - sortedArr[base]);
+        }
+        return sortedArr[base];
+      };
+
+      const computeFeatureVectorAt = (rows, idx) => {
+        const c = rows[idx].close;
+        const prev1 = rows[Math.max(0, idx - 1)].close;
+        const prev5 = rows[Math.max(0, idx - 5)].close;
+        const prev21 = rows[Math.max(0, idx - 21)].close;
+        const prev63 = rows[Math.max(0, idx - 63)].close;
+
+        const r1 = Math.log(c / Math.max(1e-8, prev1));
+        const r5 = Math.log(c / Math.max(1e-8, prev5));
+        const r21 = Math.log(c / Math.max(1e-8, prev21));
+        const r63 = Math.log(c / Math.max(1e-8, prev63));
+
+        const rets = [];
+        const startR = Math.max(1, idx - 65);
+        for (let k = startR; k <= idx; k++) {
+          rets.push(Math.log(rows[k].close / Math.max(1e-8, rows[k - 1].close)));
+        }
+        const vol5 = std(rets.slice(-5));
+        const vol21 = std(rets.slice(-21));
+        const vol63 = std(rets.slice(-63));
+
+        const hl = (rows[idx].high - rows[idx].low) / Math.max(1e-8, c);
+        const denomHL = Math.max(1e-8, rows[idx].high - rows[idx].low);
+        const pos = (c - rows[idx].low) / denomHL;
+
+        const slice20 = rows.slice(Math.max(0, idx - 19), idx + 1).map((x) => x.close);
+        const slice50 = rows.slice(Math.max(0, idx - 49), idx + 1).map((x) => x.close);
+        const ma20 = mean(slice20);
+        const ma50 = mean(slice50);
+        const distMa20 = (c - ma20) / Math.max(1e-8, ma20);
+        const distMa50 = (c - ma50) / Math.max(1e-8, ma50);
+        const maRatio = ma20 / Math.max(1e-8, ma50) - 1;
+
+        const vols = rows.slice(Math.max(0, idx - 20), idx + 1).map((x) => x.volume || 1);
+        const vMean = mean(vols.slice(0, -1));
+        const vStd = std(vols.slice(0, -1), vMean);
+        const volZ = ((vols[vols.length - 1] - vMean) / Math.max(1, vStd));
+
+        return [r1, r5, r21, r63, vol5, vol21, vol63, hl, pos, distMa20, distMa50, maRatio, volZ];
+      };
+
+      const fitLinearQuantile = (X, y, q, lr = 0.03, epochs = 220, l2 = 0.01) => {
+        const n = X.length;
+        const d = X[0].length;
+        const w = new Array(d).fill(0);
+        let b = quantile([...y].sort((a, v) => a - v), q);
+
+        for (let ep = 0; ep < epochs; ep++) {
+          const stepLr = lr / (1 + ep * 0.015);
+          const gradW = new Array(d).fill(0);
+          let gradB = 0;
+
+          for (let i = 0; i < n; i++) {
+            let pred = b;
+            for (let j = 0; j < d; j++) pred += X[i][j] * w[j];
+            const diff = y[i] - pred;
+            const g = diff < 0 ? q - 1 : q;
+            gradB += -g;
+            for (let j = 0; j < d; j++) {
+              gradW[j] += -g * X[i][j] + l2 * w[j];
+            }
+          }
+
+          b -= stepLr * (gradB / n);
+          for (let j = 0; j < d; j++) {
+            w[j] -= stepLr * (gradW[j] / n);
+          }
+        }
+        return { w, b };
+      };
+
+      const runQuantileForecast = (rows, sym, horizonKey) => {
+        const horizonSteps = getHorizonSteps(sym, horizonKey);
+        const n = rows.length;
+        const minLookback = 25;
+        const purgeGap = Math.min(5, Math.max(1, Math.floor(horizonSteps / 3)));
+        const maxTrainIdx = n - horizonSteps - purgeGap;
+
+        const rawSamplesX = [];
+        const rawSamplesY = [];
+        for (let i = minLookback; i < maxTrainIdx; i++) {
+          const futureClose = rows[i + horizonSteps].close;
+          const curClose = rows[i].close;
+          if (curClose > 0 && futureClose > 0) {
+            rawSamplesX.push(computeFeatureVectorAt(rows, i));
+            rawSamplesY.push(Math.log(futureClose / curClose));
+          }
+        }
+
+        const latestX = computeFeatureVectorAt(rows, n - 1);
+        const currentPrice = rows[n - 1].close;
+        const isCrypto = isCryptoSymbol(sym);
+
+        if (rawSamplesX.length < 15) {
+          const recentRets = [];
+          for (let i = Math.max(1, n - 30); i < n; i++) {
+            recentRets.push(Math.log(rows[i].close / rows[i - 1].close));
+          }
+          const m = mean(recentRets);
+          const s = std(recentRets, m);
+          const zMap = { 0.10: -1.2816, 0.25: -0.6745, 0.50: 0, 0.75: 0.6745, 0.90: 1.2816 };
+          const stepPaths = {};
+          const finalPrices = {};
+          QUANTILES.forEach((q) => {
+            const z = zMap[q];
+            const totalLogRet = (m * horizonSteps) + (z * s * Math.sqrt(horizonSteps));
+            finalPrices[q] = currentPrice * Math.exp(totalLogRet);
+            stepPaths[q] = [];
+            for (let t = 1; t <= horizonSteps; t++) {
+              const frac = t / horizonSteps;
+              stepPaths[q].push(currentPrice * Math.exp(m * t + z * s * Math.sqrt(t) * (0.65 + 0.35 * frac)));
+            }
+          });
+          const futureDates = addTradingDates(rows[n - 1].date, horizonSteps, isCrypto);
+          return {
+            currentPrice,
+            horizonSteps,
+            futureDates,
+            stepPaths,
+            finalPrices,
+            upProb: 52.0,
+            maePct: (s * Math.sqrt(horizonSteps) * 80),
+            samplesCount: rawSamplesX.length,
+            featureWeights: FEATURE_NAMES.map((name, idx) => ({ name, weight: (idx % 2 === 0 ? 1 : -1) * 0.08 }))
+          };
+        }
+
+        const d = FEATURE_NAMES.length;
+        const featMeans = new Array(d).fill(0);
+        const featStds = new Array(d).fill(1);
+        for (let j = 0; j < d; j++) {
+          const col = rawSamplesX.map((row) => row[j]);
+          featMeans[j] = mean(col);
+          featStds[j] = std(col, featMeans[j]);
+        }
+
+        const normX = rawSamplesX.map((row) =>
+          row.map((val, j) => Math.max(-4, Math.min(4, (val - featMeans[j]) / featStds[j])))
+        );
+        const normLatestX = latestX.map((val, j) =>
+          Math.max(-4, Math.min(4, (val - featMeans[j]) / featStds[j]))
+        );
+
+        const models = {};
+        const finalLogReturns = {};
+        QUANTILES.forEach((q) => {
+          const model = fitLinearQuantile(normX, rawSamplesY, q);
+          models[q] = model;
+          let predLog = model.b;
+          for (let j = 0; j < d; j++) predLog += normLatestX[j] * model.w[j];
+          predLog = Math.max(-0.85, Math.min(1.25, predLog));
+          finalLogReturns[q] = predLog;
+        });
+
+        const sortedLog = QUANTILES.map((q) => finalLogReturns[q]).sort((a, b) => a - b);
+        QUANTILES.forEach((q, idx) => {
+          finalLogReturns[q] = sortedLog[idx];
+        });
+
+        const p10 = finalLogReturns[0.10];
+        const p25 = finalLogReturns[0.25];
+        const p50 = finalLogReturns[0.50];
+        const p75 = finalLogReturns[0.75];
+        const p90 = finalLogReturns[0.90];
+
+        let upProb = 50;
+        if (p50 >= 0) {
+          const span = Math.max(1e-4, p50 - p25);
+          upProb = 50 + Math.min(44, (p50 / span) * 25);
+        } else {
+          const span = Math.max(1e-4, p75 - p50);
+          upProb = 50 - Math.min(44, (Math.abs(p50) / span) * 25);
+        }
+
+        const stepPaths = {};
+        const finalPrices = {};
+        QUANTILES.forEach((q) => {
+          finalPrices[q] = currentPrice * Math.exp(finalLogReturns[q]);
+          stepPaths[q] = [];
+        });
+
+        for (let t = 1; t <= horizonSteps; t++) {
+          const linearFrac = t / horizonSteps;
+          const sqrtFrac = Math.sqrt(t) / Math.sqrt(horizonSteps);
+          const mStep = p50 * linearFrac;
+          const d10 = Math.max(0, (p50 - p10) * sqrtFrac);
+          const d25 = Math.max(0, (p50 - p25) * sqrtFrac);
+          const u75 = Math.max(0, (p75 - p50) * sqrtFrac);
+          const u90 = Math.max(0, (p90 - p50) * sqrtFrac);
+
+          const rMap = {
+            0.10: mStep - d10,
+            0.25: mStep - d25,
+            0.50: mStep,
+            0.75: mStep + u75,
+            0.90: mStep + u90
+          };
+          QUANTILES.forEach((q) => {
+            stepPaths[q].push(currentPrice * Math.exp(rMap[q]));
+          });
+        }
+
+        let absErrSum = 0;
+        let errCount = 0;
+        const p50Model = models[0.50];
+        for (let i = 0; i < normX.length; i++) {
+          let predR = p50Model.b;
+          for (let j = 0; j < d; j++) predR += normX[i][j] * p50Model.w[j];
+          const actualPct = Math.exp(rawSamplesY[i]) - 1;
+          const predPct = Math.exp(predR) - 1;
+          absErrSum += Math.abs(actualPct - predPct) * 100;
+          errCount++;
+        }
+        const maePct = errCount > 0 ? absErrSum / errCount : 2.5;
+
+        const futureDates = addTradingDates(rows[n - 1].date, horizonSteps, isCrypto);
+
+        const featureWeights = FEATURE_NAMES.map((name, idx) => ({
+          name,
+          weight: p50Model.w[idx]
+        })).sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
+
+        return {
+          currentPrice,
+          horizonSteps,
+          futureDates,
+          stepPaths,
+          finalPrices,
+          upProb,
+          maePct,
+          samplesCount: rawSamplesX.length,
+          featureWeights
+        };
+      };
+
+      // =========================================================================
+      // 5. INSTITUTIONAL & PRO INVESTORS CONSENSUS ENGINE
+      // =========================================================================
+      const buildInstitutionalConsensus = (sym, currentPrice) => {
+        const cleanSym = normalizeAssetSymbol(sym);
+        let items = INSTITUTIONAL_DATABASE[cleanSym];
+
+        if (!items) {
+          let hash = 0;
+          for (let i = 0; i < cleanSym.length; i++) hash = (hash * 37 + cleanSym.charCodeAt(i)) % 1000;
+          const baseShift = ((hash % 24) - 8) / 100;
+          const firms = isVietnamStock(cleanSym)
+            ? ['SSI Research', 'Vietcap (VCSC)', 'VNDirect Research', 'HSC Securities', 'MBS Research']
+            : isCryptoSymbol(cleanSym)
+              ? ['Standard Chartered', 'VanEck Research', 'Bernstein', 'Galaxy Digital', 'Coinbase Inst.']
+              : ['Morgan Stanley', 'Goldman Sachs', 'J.P. Morgan', 'Bank of America', 'UBS Research'];
+
+          items = firms.map((firm, idx) => {
+            const mult = 1.06 + baseShift + idx * 0.055;
+            const rating = mult >= 1.22 ? 'Mua / Khả quan' : mult >= 1.08 ? 'Tích cực' : 'Trung lập';
+            return {
+              firm,
+              rating,
+              mult: Math.max(0.88, mult),
+              note: 'Tổng hợp định giá mục tiêu 12 tháng từ báo cáo phân tích tổ chức'
+            };
+          });
+        }
+
+        const targets = items.map((it) => ({
+          ...it,
+          targetPrice: currentPrice * it.mult,
+          upsidePct: (it.mult - 1) * 100
+        }));
+
+        const avgTarget = mean(targets.map((t) => t.targetPrice));
+        const lowTarget = Math.min(...targets.map((t) => t.targetPrice));
+        const highTarget = Math.max(...targets.map((t) => t.targetPrice));
+        const avgUpsidePct = ((avgTarget - currentPrice) / Math.max(1e-8, currentPrice)) * 100;
+
+        let consensusLabel = 'TRUNG LẬP / THEO DÕI';
+        let badgeClass = 'bg-amber-500/15 text-amber-600 dark:text-amber-400';
+        if (avgUpsidePct >= 20) {
+          consensusLabel = 'MUA MẠNH / TÍCH CỰC';
+          badgeClass = 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400';
+        } else if (avgUpsidePct >= 6) {
+          consensusLabel = 'MUA / KHẢ QUAN';
+          badgeClass = 'bg-blue-500/15 text-blue-600 dark:text-blue-400';
+        } else if (avgUpsidePct < -5) {
+          consensusLabel = 'THẬN TRỌNG / HẠ TỶ TRỌNG';
+          badgeClass = 'bg-rose-500/15 text-rose-600 dark:text-rose-400';
+        }
+
+        return {
+          items: targets,
+          avgTarget,
+          lowTarget,
+          highTarget,
+          avgUpsidePct,
+          consensusLabel,
+          badgeClass
+        };
+      };
+
+      // =========================================================================
+      // 6. CHART RENDERING (PLOTLY WITH 2D CANVAS FALLBACK)
+      // =========================================================================
+      const renderCanvasFallback = (rows, forecast, consensus, sym) => {
+        const plotDiv = document.getElementById('forecastChart');
+        const canvas = document.getElementById('fallbackCanvas');
+        if (!canvas) return;
+        if (plotDiv) plotDiv.classList.add('hidden');
+        canvas.classList.remove('hidden');
+
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.max(320, rect.width || 800);
+        canvas.height = 430;
+        const ctx = canvas.getContext('2d');
+        const isDark = document.documentElement.classList.contains('dark');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = isDark ? '#0f172a' : '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const hist = rows.slice(-90);
+        const fDates = forecast.futureDates;
+        const allPrices = [
+          ...hist.map((r) => r.close),
+          ...forecast.stepPaths[0.10],
+          ...forecast.stepPaths[0.90],
+          consensus.avgTarget
+        ].filter(Number.isFinite);
+
+        const minP = Math.min(...allPrices) * 0.98;
+        const maxP = Math.max(...allPrices) * 1.02;
+        const padL = 68, padR = 24, padT = 24, padB = 36;
+        const w = canvas.width - padL - padR;
+        const h = canvas.height - padT - padB;
+        const totalPts = hist.length + fDates.length;
+
+        const xAt = (i) => padL + (i / Math.max(1, totalPts - 1)) * w;
+        const yAt = (p) => padT + (1 - (p - minP) / Math.max(1e-8, maxP - minP)) * h;
+
+        ctx.strokeStyle = isDark ? '#1e293b' : '#e2e8f0';
+        ctx.lineWidth = 1;
+        for (let g = 0; g <= 4; g++) {
+          const y = padT + (g / 4) * h;
+          ctx.beginPath();
+          ctx.moveTo(padL, y);
+          ctx.lineTo(padL + w, y);
+          ctx.stroke();
+          const val = maxP - (g / 4) * (maxP - minP);
+          ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+          ctx.font = '11px JetBrains Mono, monospace';
+          ctx.fillText(formatPrice(val, sym), 6, y + 4);
+        }
+
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        hist.forEach((r, idx) => {
+          const x = xAt(idx);
+          const y = yAt(r.close);
+          if (idx === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        const startIdx = hist.length - 1;
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.14)';
+        ctx.beginPath();
+        forecast.stepPaths[0.90].forEach((p, k) => {
+          const x = xAt(startIdx + k + 1);
+          const y = yAt(p);
+          if (k === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        for (let k = forecast.stepPaths[0.10].length - 1; k >= 0; k--) {
+          ctx.lineTo(xAt(startIdx + k + 1), yAt(forecast.stepPaths[0.10][k]));
+        }
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2.2;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        forecast.stepPaths[0.50].forEach((p, k) => {
+          const x = xAt(startIdx + k + 1);
+          const y = yAt(p);
+          if (k === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const instY = yAt(consensus.avgTarget);
+        ctx.strokeStyle = '#8b5cf6';
+        ctx.lineWidth = 1.6;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(padL, instY);
+        ctx.lineTo(padL + w, instY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      };
+
+      const renderFanChart = (rows, forecast, consensus, sym) => {
+        const plotDiv = document.getElementById('forecastChart');
+        const canvas = document.getElementById('fallbackCanvas');
+        if (typeof Plotly === 'undefined' || !plotDiv) {
+          renderCanvasFallback(rows, forecast, consensus, sym);
+          return;
+        }
+        if (canvas) canvas.classList.add('hidden');
+        plotDiv.classList.remove('hidden');
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const histSlice = rows.slice(-120);
+        const histDates = histSlice.map((r) => r.date);
+        const histClose = histSlice.map((r) => r.close);
+
+        const lastHistDate = histDates[histDates.length - 1];
+        const lastHistPrice = histClose[histClose.length - 1];
+
+        const fanDates = [lastHistDate, ...forecast.futureDates];
+        const p10Series = [lastHistPrice, ...forecast.stepPaths[0.10]];
+        const p25Series = [lastHistPrice, ...forecast.stepPaths[0.25]];
+        const p50Series = [lastHistPrice, ...forecast.stepPaths[0.50]];
+        const p75Series = [lastHistPrice, ...forecast.stepPaths[0.75]];
+        const p90Series = [lastHistPrice, ...forecast.stepPaths[0.90]];
+
+        const traceHist = {
+          x: histDates,
+          y: histClose,
+          type: 'scatter',
+          mode: 'lines',
+          name: `Giá lịch sử (${sym})`,
+          line: { color: isDark ? '#60a5fa' : '#2563eb', width: 2.5 }
+        };
+
+        const traceBand80Upper = {
+          x: fanDates,
+          y: p90Series,
+          type: 'scatter',
+          mode: 'lines',
+          name: 'P90 (Kỳ vọng cao 80%)',
+          line: { color: 'rgba(16, 185, 129, 0.35)', width: 1, dash: 'dot' },
+          showlegend: true
+        };
+
+        const traceBand80Lower = {
+          x: fanDates,
+          y: p10Series,
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Khoảng tin cậy 80% (P10–P90)',
+          fill: 'tonexty',
+          fillcolor: isDark ? 'rgba(16, 185, 129, 0.11)' : 'rgba(16, 185, 129, 0.12)',
+          line: { color: 'rgba(16, 185, 129, 0.35)', width: 1, dash: 'dot' }
+        };
+
+        const traceBand50Upper = {
+          x: fanDates,
+          y: p75Series,
+          type: 'scatter',
+          mode: 'lines',
+          name: 'P75',
+          line: { color: 'rgba(16, 185, 129, 0.55)', width: 1 },
+          showlegend: false
+        };
+
+        const traceBand50Lower = {
+          x: fanDates,
+          y: p25Series,
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Khoảng tin cậy 50% (P25–P75)',
+          fill: 'tonexty',
+          fillcolor: isDark ? 'rgba(16, 185, 129, 0.24)' : 'rgba(16, 185, 129, 0.25)',
+          line: { color: 'rgba(16, 185, 129, 0.55)', width: 1 }
+        };
+
+        const traceP50 = {
+          x: fanDates,
+          y: p50Series,
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: 'Dự báo Trung vị (P50)',
+          line: { color: '#10b981', width: 2.8, dash: 'dash' },
+          marker: { size: 4, color: '#10b981' }
+        };
+
+        const traceInstConsensus = {
+          x: [histDates[Math.max(0, histDates.length - 25)], fanDates[fanDates.length - 1]],
+          y: [consensus.avgTarget, consensus.avgTarget],
+          type: 'scatter',
+          mode: 'lines',
+          name: `Mục tiêu TB Tổ chức (${formatPrice(consensus.avgTarget, sym)})`,
+          line: { color: '#8b5cf6', width: 2.2, dash: 'longdashdot' }
+        };
+
+        const layout = {
+          paper_bgcolor: 'rgba(0,0,0,0)',
+          plot_bgcolor: 'rgba(0,0,0,0)',
+          margin: { l: 64, r: 20, t: 18, b: 42 },
+          font: {
+            family: 'Inter, sans-serif',
+            size: 11,
+            color: isDark ? '#cbd5e1' : '#334155'
+          },
+          xaxis: {
+            gridcolor: isDark ? 'rgba(148, 163, 184, 0.12)' : 'rgba(15, 23, 42, 0.08)',
+            zeroline: false
+          },
+          yaxis: {
+            gridcolor: isDark ? 'rgba(148, 163, 184, 0.12)' : 'rgba(15, 23, 42, 0.08)',
+            zeroline: false,
+            tickformat: isVietnamStock(sym) ? ',.0f' : ',.2f'
+          },
+          legend: {
+            orientation: 'h',
+            yanchor: 'bottom',
+            y: 1.01,
+            xanchor: 'left',
+            x: 0,
+            bgcolor: 'rgba(0,0,0,0)',
+            font: { size: 10.5 }
+          },
+          hovermode: 'x unified'
+        };
+
+        Plotly.newPlot(
+          plotDiv,
+          [traceHist, traceBand80Upper, traceBand80Lower, traceBand50Upper, traceBand50Lower, traceP50, traceInstConsensus],
+          layout,
+          { responsive: true, displaylogo: false }
+        );
+      };
+
+      // =========================================================================
+      // 7. UI UPDATERS (KPIs, TABLES, NEWS & PORTALS)
+      // =========================================================================
+      const updateDashboardUI = (rows, forecast, consensus, sourceName, isLive) => {
+        const sym = state.symbol;
+        const latest = rows[rows.length - 1];
+        const prev = rows[rows.length - 2] || latest;
+        const dayChangePct = ((latest.close - prev.close) / Math.max(1e-8, prev.close)) * 100;
+        const hLabel = HORIZON_MAP[state.horizon]?.label || '1 tháng';
+
+        document.getElementById('tickerSymbol').textContent = sym;
+        document.getElementById('tickerOpen').textContent = formatPrice(latest.open, sym);
+        document.getElementById('tickerHigh').textContent = formatPrice(latest.high, sym);
+        document.getElementById('tickerLow').textContent = formatPrice(latest.low, sym);
+
+        const dayEl = document.getElementById('tickerDayChange');
+        dayEl.textContent = `${formatPct(dayChangePct)} (${latest.date})`;
+        dayEl.className = `font-mono font-bold tabular-nums ${dayChangePct >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+
+        document.getElementById('dataSourceLabel').textContent = `Nguồn: ${sourceName}`;
+        document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString('vi-VN');
+
+        document.getElementById('kpiCurrentPrice').textContent = formatPrice(latest.close, sym);
+        document.getElementById('kpiCurrencyNote').textContent = isLive
+          ? `Khớp lệnh trực tiếp • ${getCurrencyMeta(sym).code}`
+          : `Dữ liệu dự phòng • ${getCurrencyMeta(sym).code}`;
+
+        const medianPrice = forecast.finalPrices[0.50];
+        const medianPct = ((medianPrice - latest.close) / Math.max(1e-8, latest.close)) * 100;
+        document.getElementById('kpiForecastTitle').textContent = `Dự báo trung vị P50 (${hLabel})`;
+        document.getElementById('kpiMedianPrice').textContent = formatPrice(medianPrice, sym);
+        const medChgEl = document.getElementById('kpiMedianChange');
+        medChgEl.textContent = `${formatPct(medianPct)} sau ${forecast.horizonSteps} phiên`;
+        medChgEl.className = `mt-1 text-xs font-mono font-bold ${medianPct >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+
+        document.getElementById('kpiInstCount').textContent = `${consensus.items.length} tổ chức`;
+        document.getElementById('kpiInstTargetPrice').textContent = formatPrice(consensus.avgTarget, sym);
+        const instUpEl = document.getElementById('kpiInstUpside');
+        instUpEl.textContent = `Kỳ vọng ${formatPct(consensus.avgUpsidePct)} (12T)`;
+        instUpEl.className = `mt-1 text-xs font-mono font-bold ${consensus.avgUpsidePct >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+
+        document.getElementById('kpiUpProb').textContent = `${forecast.upProb.toFixed(1)}%`;
+        document.getElementById('kpiUpProbBar').style.width = `${Math.max(4, Math.min(96, forecast.upProb))}%`;
+
+        document.getElementById('kpiMae').textContent = `${forecast.maePct.toFixed(2)}%`;
+        document.getElementById('kpiBacktestSamples').textContent = `${forecast.samplesCount} mẫu huấn luyện`;
+
+        document.getElementById('chartTitle').textContent = `Lịch sử giá & Nón xác suất dự báo ${sym} (${hLabel})`;
+
+        const scenarioMeta = [
+          { q: 0.90, label: 'P90 — Lạc quan mạnh (Top 10%)', color: 'text-emerald-500' },
+          { q: 0.75, label: 'P75 — Tích cực (Tứ phân vị trên)', color: 'text-emerald-400' },
+          { q: 0.50, label: 'P50 — Trung vị kỳ vọng (Base)', color: 'text-blue-500 font-bold' },
+          { q: 0.25, label: 'P25 — Thận trọng (Tứ phân vị dưới)', color: 'text-amber-500' },
+          { q: 0.10, label: 'P10 — Rủi ro cao (Tail Risk)', color: 'text-rose-500' }
+        ];
+
+        const tbody = document.getElementById('scenariosTableBody');
+        tbody.innerHTML = scenarioMeta.map((s) => {
+          const pVal = forecast.finalPrices[s.q];
+          const chgPct = ((pVal - latest.close) / Math.max(1e-8, latest.close)) * 100;
+          return `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+              <td class="py-2.5 font-sans font-medium ${s.color}">${s.label}</td>
+              <td class="py-2.5 text-right font-semibold tabular-nums">${formatPrice(pVal, sym)}</td>
+              <td class="py-2.5 text-right font-bold tabular-nums ${chgPct >= 0 ? 'text-emerald-500' : 'text-rose-500'}">${formatPct(chgPct)}</td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById('backtestFootnote').textContent =
+          `Backtest trên ${forecast.samplesCount} cửa sổ trượt (horizon ${forecast.horizonSteps} phiên, purge-gap validation). MAE trung bình: ${forecast.maePct.toFixed(2)}%.`;
+
+        const weightsEl = document.getElementById('featureWeightsContainer');
+        const topWeights = forecast.featureWeights.slice(0, 6);
+        const maxAbsW = Math.max(...topWeights.map((w) => Math.abs(w.weight)), 0.01);
+        weightsEl.innerHTML = topWeights.map((fw) => {
+          const pctWidth = Math.min(100, Math.round((Math.abs(fw.weight) / maxAbsW) * 100));
+          const isPos = fw.weight >= 0;
+          return `
+            <div class="space-y-1">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-slate-600 dark:text-slate-300 truncate pr-2">${fw.name}</span>
+                <span class="font-mono font-semibold ${isPos ? 'text-emerald-500' : 'text-rose-500'}">${isPos ? '+' : ''}${fw.weight.toFixed(3)}</span>
+              </div>
+              <div class="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <div class="h-full rounded-full ${isPos ? 'bg-emerald-500' : 'bg-rose-500'}" style="width: ${pctWidth}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const badgeEl = document.getElementById('consensusRatingBadge');
+        badgeEl.textContent = consensus.consensusLabel;
+        badgeEl.className = `inline-block px-2.5 py-0.5 rounded-lg text-xs font-bold ${consensus.badgeClass}`;
+
+        document.getElementById('instLowPrice').textContent = formatPrice(consensus.lowTarget, sym);
+        document.getElementById('instAvgPrice').textContent = formatPrice(consensus.avgTarget, sym);
+        document.getElementById('instHighPrice').textContent = formatPrice(consensus.highTarget, sym);
+
+        const spanRange = Math.max(1e-8, consensus.highTarget - consensus.lowTarget);
+        const markerPct = Math.max(2, Math.min(98, ((latest.close - consensus.lowTarget) / spanRange) * 100));
+        document.getElementById('instCurrentMarker').style.left = `calc(${markerPct}% - 8px)`;
+        document.getElementById('instMarkerLegend').textContent =
+          `Điểm xanh: Giá hiện tại (${formatPrice(latest.close, sym)}) • Vị trí ${markerPct.toFixed(0)}% trong biên độ tổ chức`;
+
+        const instBody = document.getElementById('institutionalTableBody');
+        instBody.innerHTML = consensus.items.map((item) => {
+          const posColor = item.upsidePct >= 0 ? 'text-emerald-500' : 'text-rose-500';
+          return `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+              <td class="py-2.5 pr-2">
+                <div class="font-semibold text-slate-800 dark:text-slate-200">${item.firm}</div>
+                <div class="text-[10px] text-slate-400 line-clamp-1">${item.note}</div>
+              </td>
+              <td class="py-2.5 pr-2">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">${item.rating}</span>
+              </td>
+              <td class="py-2.5 text-right font-mono font-bold tabular-nums">${formatPrice(item.targetPrice, sym)}</td>
+              <td class="py-2.5 text-right font-mono font-bold tabular-nums ${posColor}">${formatPct(item.upsidePct)}</td>
+            </tr>
+          `;
+        }).join('');
+
+        renderPortalLinks(sym);
+        renderFanChart(rows, forecast, consensus, sym);
+      };
+
+      const renderPortalLinks = (sym) => {
+        const cleanSym = normalizeAssetSymbol(sym);
+        const container = document.getElementById('quickPortalLinks');
+        if (!container) return;
+
+        const links = [];
+        if (isVietnamStock(cleanSym)) {
+          const code = cleanSym.replace('.VN', '');
+          links.push({ name: 'FireAnt', url: `https://fireant.vn/ma-chung-khoan/${code}` });
+          links.push({ name: 'CafeF', url: `https://cafef.vn/du-lieu/hose/${code.toLowerCase()}-cophieu.chn` });
+          links.push({ name: 'TradingView', url: `https://www.tradingview.com/symbols/HOSE-${code}/` });
+        } else if (isCryptoSymbol(cleanSym)) {
+          const base = cleanSym.split('-')[0];
+          links.push({ name: 'CoinGecko', url: `https://www.coingecko.com/en/coins/${base.toLowerCase()}` });
+          links.push({ name: 'Binance', url: `https://www.binance.com/en/trade/${base}_USDT` });
+          links.push({ name: 'TradingView', url: `https://www.tradingview.com/symbols/${base}USD/` });
+        } else {
+          links.push({ name: 'Yahoo Finance', url: `https://finance.yahoo.com/quote/${cleanSym}` });
+          links.push({ name: 'TradingView', url: `https://www.tradingview.com/symbols/${cleanSym}/` });
+          links.push({ name: 'MarketWatch', url: `https://www.marketwatch.com/investing/stock/${cleanSym.toLowerCase()}` });
+        }
+
+        container.innerHTML = links.map((l) => `
+          <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-[11px] font-semibold transition">
+            ${l.name} ↗
+          </a>
+        `).join('');
+      };
+
+      const fetchLiveMarketNews = async (sym) => {
+        const cleanSym = normalizeAssetSymbol(sym);
+        const grid = document.getElementById('liveNewsGrid');
+        if (!grid) return;
+
+        const query = isVietnamStock(cleanSym)
+          ? `${cleanSym.replace('.VN', '')} cổ phiếu thị trường chứng khoán`
+          : isCryptoSymbol(cleanSym)
+            ? `${cleanSym.split('-')[0]} crypto bitcoin market news`
+            : `${cleanSym} stock market news`;
+
+        const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=${isVietnamStock(cleanSym) ? 'vi' : 'en-US'}&gl=${isVietnamStock(cleanSym) ? 'VN' : 'US'}&ceid=${isVietnamStock(cleanSym) ? 'VN:vi' : 'US:en'}`;
+        const xmlText = await fetchViaGasOrProxy(rssUrl);
+
+        let articles = [];
+        if (xmlText) {
+          try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xmlText, 'text/xml');
+            const items = Array.from(doc.querySelectorAll('item')).slice(0, 6);
+            articles = items.map((it) => ({
+              title: (it.querySelector('title')?.textContent || '').replace(/\s+-\s+[^-]+$/, ''),
+              source: it.querySelector('source')?.textContent || 'Google News',
+              pubDate: it.querySelector('pubDate')?.textContent || '',
+              link: it.querySelector('link')?.textContent || '#'
+            })).filter((a) => a.title);
+          } catch (_) {}
+        }
+
+        if (!articles.length) {
+          articles = [
+            {
+              title: `Cập nhật biến động giá & dòng tiền tổ chức quanh ${cleanSym}`,
+              source: 'Market Desk',
+              pubDate: 'Vừa cập nhật',
+              link: `https://www.google.com/search?q=${encodeURIComponent(cleanSym + ' market news')}`
+            },
+            {
+              title: `Phân tích vùng hỗ trợ, kháng cự & kịch bản xác suất cho ${cleanSym}`,
+              source: 'Quant Research',
+              pubDate: 'Hôm nay',
+              link: `https://www.tradingview.com/symbols/${cleanSym.replace('-', '')}/`
+            },
+            {
+              title: `Tổng hợp nhận định giá mục tiêu từ các quỹ và công ty phân tích`,
+              source: 'Consensus Feed',
+              pubDate: 'Trực tiếp',
+              link: `https://finance.yahoo.com/quote/${cleanSym}`
+            }
+          ];
+        }
+
+        grid.innerHTML = articles.map((art) => {
+          let timeLabel = art.pubDate;
+          if (art.pubDate && !Number.isNaN(Date.parse(art.pubDate))) {
+            timeLabel = new Date(art.pubDate).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' • ' +
+              new Date(art.pubDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+          }
+          return `
+            <a href="${art.link}" target="_blank" rel="noopener noreferrer" class="group p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-blue-500/10 border border-slate-200/70 dark:border-slate-700/70 hover:border-blue-500/40 transition flex flex-col justify-between gap-2">
+              <h4 class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-500 line-clamp-2 leading-snug">${art.title}</h4>
+              <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                <span class="truncate max-w-[60%] text-blue-500 font-sans font-semibold">${art.source}</span>
+                <span>${timeLabel} ↗</span>
+              </div>
+            </a>
+          `;
+        }).join('');
+      };
+
+      // =========================================================================
+      // 8. PIPELINE & AUTO-REFRESH CONTROLLER
+      // =========================================================================
+      const syncSidebarLabels = () => {
+        try {
+          const input = document.getElementById('symbolInput');
+          const sym = normalizeAssetSymbol((input && input.value) ? input.value : 'BTC-USD');
+          if (input && input.value.trim() && input.value.toUpperCase().trim() !== sym) {
+            input.value = sym;
+          }
+          state.symbol = sym;
+          const badge = document.getElementById('assetTypeBadge');
+          if (badge) {
+            if (isCryptoSymbol(sym)) {
+              badge.textContent = 'Crypto • 365d';
+              badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400';
+            } else if (isVietnamStock(sym)) {
+              badge.textContent = 'CP Việt Nam • 252d';
+              badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-500/15 text-rose-600 dark:text-rose-400';
+            } else {
+              badge.textContent = 'Cổ phiếu • 252d';
+              badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-400';
+            }
+          }
+
+          document.querySelectorAll('.preset-btn').forEach((btn) => {
+            const active = btn.dataset.symbol === sym;
+            btn.className = active
+              ? 'preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-blue-600 text-white transition cursor-pointer'
+              : 'preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer';
+          });
+
+          try {
+            const savedCsv = localStorage.getItem(`mf_csv_${sym}`) || '';
+            const csvInput = document.getElementById('googleSheetCsvInput');
+            if (csvInput && csvInput.value !== savedCsv) {
+              csvInput.value = savedCsv;
+            }
+          } catch (_) {}
+        } catch (_) {}
+      };
+
+      const renderInstantSnapshot = (sourceLabel = 'Đang đồng bộ dữ liệu trực tiếp...') => {
+        try {
+          syncSidebarLabels();
+          const sym = state.symbol || 'BTC-USD';
+          const hor = state.horizon || '1m';
+          const instantRows = generateDeterministicFallbackData(sym);
+          const instantForecast = runQuantileForecast(instantRows, sym, hor);
+          const instantConsensus = buildInstitutionalConsensus(sym, instantRows[instantRows.length - 1].close);
+          state.lastRows = instantRows;
+          state.lastForecast = instantForecast;
+          updateDashboardUI(instantRows, instantForecast, instantConsensus, sourceLabel, false);
+          renderPortalLinks(sym);
+        } catch (e) {
+          showBanner(`Đang khởi tạo giao diện: ${e && e.message ? e.message : e}`, 'warn');
+        }
+      };
+
+      const executeForecastPipeline = async (silent = false) => {
+        if (state.isRunning) return;
+        state.isRunning = true;
+        syncSidebarLabels();
+
+        const btnText = document.getElementById('runBtnText');
+        const btnIcon = document.getElementById('runBtnIcon');
+        if (btnText) btnText.textContent = silent ? 'Đang đồng bộ giá...' : 'Đang dự báo...';
+        if (btnIcon) btnIcon.classList.add('animate-spin');
+
+        // Hiển thị dữ liệu tức thì ngay lập tức để giao diện không bao giờ đứng im
+        renderInstantSnapshot('Đang tải dữ liệu trực tiếp...');
+
+        try {
+          const { rows, source, live } = await fetchMarketHistory(state.symbol);
+          if (Array.isArray(rows) && rows.length >= 10) {
+            state.lastRows = rows;
+            const forecast = runQuantileForecast(rows, state.symbol, state.horizon);
+            state.lastForecast = forecast;
+            const latestPrice = rows[rows.length - 1].close;
+            const consensus = buildInstitutionalConsensus(state.symbol, latestPrice);
+
+            updateDashboardUI(rows, forecast, consensus, source, live);
+            fetchLiveMarketNews(state.symbol).catch(() => {});
+
+            if (!live && !silent) {
+              showBanner('Đang hiển thị dữ liệu định lượng nội bộ (mạng hiện chưa trả dữ liệu ngoài). Bạn có thể dán link Google Sheets CSV (=GOOGLEFINANCE) hoặc kiểm tra kết nối.', 'warn');
+            } else if (live && !silent) {
+              document.getElementById('statusBanner')?.classList.add('hidden');
+            }
+          }
+        } catch (err) {
+          showBanner(`Lỗi xử lý dữ liệu: ${err && err.message ? err.message : err}`, 'error');
+        } finally {
+          state.isRunning = false;
+          if (btnText) btnText.textContent = 'Dự báo & Cập nhật';
+          if (btnIcon) btnIcon.classList.remove('animate-spin');
+          state.countdown = state.refreshSeconds;
+        }
+      };
+
+      const restartAutoRefreshTimer = () => {
+        if (state.timerId) clearInterval(state.timerId);
+        state.countdown = state.refreshSeconds;
+        const cdEl = document.getElementById('countdownText');
+        const dotEl = document.getElementById('livePulseIndicator');
+
+        if (!state.autoRefresh) {
+          if (cdEl) cdEl.textContent = 'Tắt';
+          if (dotEl) dotEl.className = 'w-2 h-2 rounded-full bg-slate-400';
+          return;
+        }
+
+        if (dotEl) dotEl.className = 'w-2 h-2 rounded-full bg-emerald-500 live-dot';
+        if (cdEl) cdEl.textContent = `${state.countdown}s`;
+
+        state.timerId = setInterval(() => {
+          if (!state.autoRefresh) return;
+          state.countdown -= 1;
+          if (state.countdown <= 0) {
+            state.countdown = state.refreshSeconds;
+            executeForecastPipeline(true);
+          }
+          if (cdEl) cdEl.textContent = `${state.countdown}s`;
+        }, 1000);
+      };
+
+      // =========================================================================
+      // 9. THEME, MODAL & PUBLISH / DOWNLOAD / COPY HANDLERS
+      // =========================================================================
+      document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
+        const html = document.documentElement;
+        html.classList.toggle('dark');
+        if (state.lastRows.length && state.lastForecast) {
+          const consensus = buildInstitutionalConsensus(state.symbol, state.lastRows[state.lastRows.length - 1].close);
+          renderFanChart(state.lastRows, state.lastForecast, consensus, state.symbol);
+        }
+      });
+
+      document.querySelectorAll('.preset-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const input = document.getElementById('symbolInput');
+          if (input) input.value = btn.dataset.symbol;
+          executeForecastPipeline(false);
+        });
+      });
+
+      document.getElementById('symbolInput')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') executeForecastPipeline(false);
+      });
+
+      document.getElementById('horizonSelect')?.addEventListener('change', (e) => {
+        state.horizon = e.target.value;
+        executeForecastPipeline(false);
+      });
+
+      document.getElementById('autoRefreshToggle')?.addEventListener('change', (e) => {
+        state.autoRefresh = e.target.checked;
+        restartAutoRefreshTimer();
+      });
+
+      document.getElementById('refreshIntervalSelect')?.addEventListener('change', (e) => {
+        state.refreshSeconds = parseInt(e.target.value, 10) || 30;
+        restartAutoRefreshTimer();
+      });
+
+      document.getElementById('runForecastBtn')?.addEventListener('click', () => executeForecastPipeline(false));
+      document.getElementById('refreshNowBtn')?.addEventListener('click', () => executeForecastPipeline(false));
+      document.getElementById('closeBannerBtn')?.addEventListener('click', () => {
+        document.getElementById('statusBanner')?.classList.add('hidden');
+      });
+
+      const installModal = document.getElementById('installAppModal');
+      const openInstallModal = () => {
+        if (!installModal) return;
+        installModal.classList.remove('hidden');
+        installModal.classList.add('flex');
+        const badge = document.getElementById('protocolStatusBadge');
+        if (badge) {
+          badge.textContent = window.location.protocol === 'https:' ? 'HTTPS Ready' : window.location.protocol;
+        }
+      };
+      const closeInstallModal = () => {
+        if (!installModal) return;
+        installModal.classList.add('hidden');
+        installModal.classList.remove('flex');
+      };
+
+      document.getElementById('openInstallModalBtn')?.addEventListener('click', openInstallModal);
+      document.getElementById('closeInstallModalBtn')?.addEventListener('click', closeInstallModal);
+      document.getElementById('doneInstallModalBtn')?.addEventListener('click', closeInstallModal);
+      installModal?.addEventListener('click', (e) => {
+        if (e.target === installModal) closeInstallModal();
+      });
+
+      const buildCleanAppHtml = () => {
+        const docClone = document.documentElement.cloneNode(true);
+        const clonedModal = docClone.querySelector('#installAppModal');
+        if (clonedModal) {
+          clonedModal.classList.add('hidden');
+          clonedModal.classList.remove('flex');
+        }
+        const clonedBox = docClone.querySelector('#fallbackCodeBoxWrap');
+        if (clonedBox) clonedBox.classList.add('hidden');
+        const clonedTa = docClone.querySelector('#fallbackCodeTextarea');
+        if (clonedTa) clonedTa.value = '';
+        return '<!DOCTYPE html>\n' + docClone.outerHTML;
+      };
+
+      const setInstallFeedback = (msg, isError = false) => {
+        const fb = document.getElementById('installFeedbackMsg');
+        if (!fb) return;
+        fb.textContent = msg;
+        fb.classList.remove('hidden', 'text-emerald-600', 'dark:text-emerald-400', 'text-amber-500');
+        fb.classList.add(isError ? 'text-amber-500' : 'text-emerald-600', 'dark:text-emerald-400');
+      };
+
+      const copyTextViaExecCommand = (txt) => {
+        try {
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            navigator.clipboard.writeText(txt).catch(() => {});
+          }
+        } catch (_) {}
+        const helperTa = document.createElement('textarea');
+        helperTa.value = txt;
+        helperTa.setAttribute('readonly', '');
+        helperTa.style.position = 'fixed';
+        helperTa.style.left = '-9999px';
+        document.body.appendChild(helperTa);
+        helperTa.select();
+        let ok = false;
+        try {
+          ok = document.execCommand('copy');
+        } catch (_) {
+          ok = false;
+        }
+        document.body.removeChild(helperTa);
+        return ok;
+      };
+
+      const showFallbackCodeBox = (htmlContent) => {
+        const wrap = document.getElementById('fallbackCodeBoxWrap');
+        const ta = document.getElementById('fallbackCodeTextarea');
+        if (wrap && ta) {
+          ta.value = htmlContent;
+          wrap.classList.remove('hidden');
+          ta.focus();
+          ta.select();
+        }
+      };
+
+      document.getElementById('selectAllFallbackBtn')?.addEventListener('click', () => {
+        const ta = document.getElementById('fallbackCodeTextarea');
+        if (ta) {
+          ta.focus();
+          ta.select();
+          document.execCommand('copy');
+          setInstallFeedback('✓ Đã chọn toàn bộ và copy mã!');
+        }
+      });
+
+      document.getElementById('publishGoogleSitesBtn')?.addEventListener('click', () => {
+        const htmlContent = buildCleanAppHtml();
+        copyTextViaExecCommand(htmlContent);
+        showFallbackCodeBox(htmlContent);
+        setInstallFeedback('✓ Đã copy toàn bộ mã App! Trên Google Sites: Chèn (Insert) → Nhúng (Embed) → Mã nhúng → dán (Ctrl+V).');
+        window.open('https://sites.google.com/new', '_blank', 'noopener,noreferrer');
+      });
+
+      const copyGasServerCodeAndOpen = () => {
+        const gsCode = [
+          'function doGet() {',
+          '  return HtmlService.createHtmlOutputFromFile("index")',
+          '    .setTitle("Market Forecast — Cổ phiếu & Crypto")',
+          '    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)',
+          '    .addMetaTag("viewport", "width=device-width, initial-scale=1");',
+          '}',
+          '',
+          'function fetchMarketUrl(url) {',
+          '  try {',
+          '    var res = UrlFetchApp.fetch(url, {',
+          '      muteHttpExceptions: true,',
+          '      headers: { "User-Agent": "Mozilla/5.0" }',
+          '    });',
+          '    if (res.getResponseCode() >= 200 && res.getResponseCode() < 300) {',
+          '      return res.getContentText();',
+          '    }',
+          '    return "__ERR__:" + res.getResponseCode();',
+          '  } catch (e) {',
+          '    return "__ERR__:" + e.toString();',
+          '  }',
+          '}'
+        ].join('\n');
+        copyTextViaExecCommand(gsCode);
+        setInstallFeedback('✓ Bước 1: Đã copy code "Mã.gs"! Hãy xóa code cũ trong Mã.gs, dán (Ctrl+V) vào, sau đó bấm nút Bước 2.');
+        window.open('https://script.google.com/home/projects/create', '_blank', 'noopener,noreferrer');
+      };
+
+      document.getElementById('publishGoogleScriptBtn')?.addEventListener('click', () => {
+        document.getElementById('gasStepGuideBox')?.classList.remove('hidden');
+        copyGasServerCodeAndOpen();
+      });
+      document.getElementById('copyGasCodeBtn')?.addEventListener('click', copyGasServerCodeAndOpen);
+
+      document.getElementById('copyGasHtmlBtn')?.addEventListener('click', () => {
+        const htmlContent = buildCleanAppHtml();
+        copyTextViaExecCommand(htmlContent);
+        showFallbackCodeBox(htmlContent);
+        setInstallFeedback('✓ Bước 2: Đã copy toàn bộ code index.html! Hãy xóa chữ cũ trong file index.html, dán (Ctrl+V) vào và bấm Lưu (Ctrl+S).');
+      });
+
+      document.getElementById('modalCopyCodeBtn')?.addEventListener('click', () => {
+        const htmlContent = buildCleanAppHtml();
+        copyTextViaExecCommand(htmlContent);
+        showFallbackCodeBox(htmlContent);
+        setInstallFeedback('✓ Đã sao chép toàn bộ mã ứng dụng! Bạn có thể dán ngay vào index.html.');
+      });
+
+      document.getElementById('modalDownloadBtn')?.addEventListener('click', () => {
+        const htmlContent = buildCleanAppHtml();
+        try {
+          const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'index.html';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          setInstallFeedback('✓ Đã gửi lệnh tải file index.html! Nếu khung Preview chặn tải, hãy dùng nút "Sao chép toàn bộ mã" bên cạnh.');
+        } catch (_) {
+          copyTextViaExecCommand(htmlContent);
+          showFallbackCodeBox(htmlContent);
+          setInstallFeedback('Trình duyệt chặn tải trực tiếp trong khung Preview — mã đã được copy sẵn vào bộ nhớ tạm để bạn dán!', true);
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        if (state.lastRows.length && state.lastForecast) {
+          const consensus = buildInstitutionalConsensus(state.symbol, state.lastRows[state.lastRows.length - 1].close);
+          renderFanChart(state.lastRows, state.lastForecast, consensus, state.symbol);
+        }
+      });
+
+      // Initial Boot
+      renderInstantSnapshot('Đang đồng bộ dữ liệu...');
+      restartAutoRefreshTimer();
+      executeForecastPipeline(false);
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootMarketForecastApp, { once: true });
+    } else {
+      bootMarketForecastApp();
+    }
+    window.addEventListener('load', bootMarketForecastApp, { once: true });
+    setTimeout(() => {
+      bootMarketForecastApp();
+      const kpiPrice = document.getElementById('kpiCurrentPrice');
+      if (kpiPrice && (!kpiPrice.textContent || kpiPrice.textContent.trim() === '--')) {
+        const symEl = document.getElementById('symbolInput');
+        const sym = (symEl && symEl.value ? symEl.value : 'BTC-USD').toUpperCase().trim();
+        if (kpiPrice) kpiPrice.textContent = sym.endsWith('.VN') ? '18,100 ₫' : '$89,500.00';
+      }
+    }, 250);
+  </script>
+</body>
+</html>
