@@ -108,7 +108,7 @@
   </header>
 
   <!-- Main Workspace -->
-  <div class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
 
     <!-- Left Control Sidebar -->
     <aside class="lg:col-span-3 space-y-5">
@@ -118,31 +118,50 @@
           <span id="assetTypeBadge" class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400">Crypto • 365d</span>
         </div>
 
-        <!-- Symbol Input -->
+        <!-- Symbol Input & Quick Swap -->
         <div class="space-y-1.5">
           <label for="symbolInput" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Mã Cổ phiếu / Crypto</label>
-          <div class="relative">
-            <input id="symbolInput" type="text" value="BTC-USD" placeholder="VD: BTC-USD, MBB, FPT.VN, NVDA" class="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            <button id="refreshNowBtn" type="button" title="Làm mới giá ngay" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-slate-200/60 dark:hover:bg-slate-700 transition cursor-pointer">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M5.64 18.36A9 9 0 0020 12M4 12a9 9 0 0114.36-6.36" />
-              </svg>
-            </button>
+          <div class="flex gap-2">
+            <input id="symbolInput" type="text" value="BTC-USD" placeholder="VD: MBB.VN, FPT.VN, BTC-USD, NVDA" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-sm font-semibold uppercase focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button id="swapSymbolBtn" type="button" title="Đổi nhanh giữa CP Việt Nam & Crypto/Mỹ" class="px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white border border-slate-300 dark:border-slate-700 text-xs font-bold transition cursor-pointer shrink-0">⇄</button>
           </div>
         </div>
 
-        <!-- Quick Symbol Presets -->
-        <div class="space-y-1.5">
-          <span class="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Chọn nhanh phổ biến:</span>
-          <div class="flex flex-wrap gap-1.5">
-            <button type="button" data-symbol="BTC-USD" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-blue-600 text-white transition cursor-pointer">BTC-USD</button>
-            <button type="button" data-symbol="ETH-USD" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">ETH-USD</button>
-            <button type="button" data-symbol="SOL-USD" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">SOL-USD</button>
-            <button type="button" data-symbol="MBB.VN" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">MBB.VN</button>
-            <button type="button" data-symbol="FPT.VN" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">FPT.VN</button>
-            <button type="button" data-symbol="VCB.VN" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">VCB.VN</button>
-            <button type="button" data-symbol="HPG.VN" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">HPG.VN</button>
-            <button type="button" data-symbol="NVDA" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">NVDA</button>
+        <!-- Quick Symbol Presets Split Into 2 Columns -->
+        <div class="space-y-2">
+          <span class="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Chọn nhanh theo 2 nhóm thị trường:</span>
+          <div class="grid grid-cols-2 gap-2.5">
+            <!-- Column 1: Vietnam Stocks -->
+            <div class="p-2 rounded-xl bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/20 space-y-1.5">
+              <div class="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center justify-between">
+                <span>🇻🇳 CP Việt Nam</span>
+                <span class="font-mono text-[9px] opacity-75">VND</span>
+              </div>
+              <div class="flex flex-wrap gap-1">
+                <button type="button" data-symbol="MBB.VN" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-rose-600 hover:text-white transition cursor-pointer">MBB.VN</button>
+                <button type="button" data-symbol="FPT.VN" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-rose-600 hover:text-white transition cursor-pointer">FPT.VN</button>
+                <button type="button" data-symbol="VCB.VN" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-rose-600 hover:text-white transition cursor-pointer">VCB.VN</button>
+                <button type="button" data-symbol="HPG.VN" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-rose-600 hover:text-white transition cursor-pointer">HPG.VN</button>
+                <button type="button" data-symbol="TCB.VN" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-rose-600 hover:text-white transition cursor-pointer">TCB.VN</button>
+                <button type="button" data-symbol="SSI.VN" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-rose-600 hover:text-white transition cursor-pointer">SSI.VN</button>
+              </div>
+            </div>
+
+            <!-- Column 2: Crypto & US Stocks -->
+            <div class="p-2 rounded-xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 space-y-1.5">
+              <div class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center justify-between">
+                <span>🌐 Crypto &amp; Mỹ</span>
+                <span class="font-mono text-[9px] opacity-75">USD</span>
+              </div>
+              <div class="flex flex-wrap gap-1">
+                <button type="button" data-symbol="BTC-USD" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-blue-600 text-white transition cursor-pointer">BTC-USD</button>
+                <button type="button" data-symbol="ETH-USD" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white transition cursor-pointer">ETH-USD</button>
+                <button type="button" data-symbol="SOL-USD" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white transition cursor-pointer">SOL-USD</button>
+                <button type="button" data-symbol="NVDA" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white transition cursor-pointer">NVDA</button>
+                <button type="button" data-symbol="AAPL" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white transition cursor-pointer">AAPL</button>
+                <button type="button" data-symbol="TSLA" class="preset-btn px-2 py-1 rounded-md text-[11px] font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white transition cursor-pointer">TSLA</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -244,11 +263,20 @@
             <span class="text-slate-400 block text-[10px] uppercase">Biến động ngày</span>
             <span id="tickerDayChange" class="font-mono font-bold tabular-nums">--</span>
           </div>
+          <div class="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+            <span id="dataSourceLabel" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-medium">Nguồn: Đang kết nối...</span>
+            <span id="lastSyncTime" class="font-mono">--:--:--</span>
+            <button id="refreshNowBtn" type="button" title="Cập nhật ngay" class="px-2 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white font-semibold transition cursor-pointer">↻</button>
+          </div>
+      </div>
+
+      <!-- Direct Live Price Verification Links Bar (Vietnam & Global Exchanges) -->
+      <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 live-dot"></span>
+          <span id="liveBridgeTitle" class="font-semibold text-slate-700 dark:text-slate-200">Liên kết đối chiếu bảng giá trực tiếp:</span>
         </div>
-        <div class="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
-          <span id="dataSourceLabel" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-medium">Nguồn: Đang kết nối...</span>
-          <span id="lastSyncTime" class="font-mono">--:--:--</span>
-        </div>
+        <div id="liveExchangeLinksBar" class="flex flex-wrap items-center gap-1.5"></div>
       </div>
 
       <!-- 5 KPI Metric Cards -->
@@ -720,23 +748,30 @@
           } catch (_) {}
         }
 
-        // 2. Direct fetch
+        // 2. Direct fetch with timeout
         try {
-          const r = await fetch(targetUrl, { cache: 'no-store' });
+          const ctrl = new AbortController();
+          const tId = setTimeout(() => ctrl.abort(), 5500);
+          const r = await fetch(targetUrl, { cache: 'no-store', signal: ctrl.signal });
+          clearTimeout(tId);
           if (r.ok) return await r.text();
         } catch (_) {}
 
-        // 3. Public CORS proxy fallbacks
+        // 3. Multi-proxy CORS rotation for GitHub Pages / Static Web Hosting
         const proxies = [
           `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-          `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`
+          `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
+          `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`
         ];
         for (const pUrl of proxies) {
           try {
-            const r = await fetch(pUrl, { cache: 'no-store' });
+            const ctrl = new AbortController();
+            const tId = setTimeout(() => ctrl.abort(), 6500);
+            const r = await fetch(pUrl, { cache: 'no-store', signal: ctrl.signal });
+            clearTimeout(tId);
             if (r.ok) {
               const txt = await r.text();
-              if (txt && txt.length > 10) return txt;
+              if (txt && txt.length > 15 && !txt.includes('Just a moment...')) return txt;
             }
           } catch (_) {}
         }
@@ -808,29 +843,95 @@
         const toTs = Math.floor(Date.now() / 1000);
         const fromTs = toTs - 550 * 86400;
 
+        // Chuẩn hóa đơn vị giá cổ phiếu Việt Nam về VNĐ đồng (tránh trường hợp API trả theo nghìn đồng như 18.1 hoặc đã trả 18100)
+        const normalizeVnSeries = (tArr, oArr, hArr, lArr, cArr, vArr) => {
+          const validCloses = cArr.filter((x) => typeof x === 'number' && Number.isFinite(x) && x > 0);
+          if (validCloses.length < 15) return null;
+          const recentSlice = validCloses.slice(-10);
+          const medianRecent = [...recentSlice].sort((a, b) => a - b)[Math.floor(recentSlice.length / 2)];
+          // Cổ phiếu VN trên sàn thường giao dịch từ ~3,000đ đến ~250,000đ; nếu giá trị ở mức < 500 thì là đơn vị nghìn đồng (vd: 18.1 -> 18,100đ)
+          const multiplier = medianRecent < 500 ? 1000 : 1;
+          const rows = [];
+          for (let i = 0; i < tArr.length; i++) {
+            const rawC = cArr[i];
+            if (typeof rawC !== 'number' || !Number.isFinite(rawC) || rawC <= 0) continue;
+            const c = rawC * multiplier;
+            const o = (typeof oArr?.[i] === 'number' && oArr[i] > 0 ? oArr[i] : rawC) * multiplier;
+            const h = (typeof hArr?.[i] === 'number' && hArr[i] > 0 ? hArr[i] : Math.max(o, c)) * multiplier;
+            const l = (typeof lArr?.[i] === 'number' && lArr[i] > 0 ? lArr[i] : Math.min(o, c)) * multiplier;
+            const v = typeof vArr?.[i] === 'number' && vArr[i] >= 0 ? vArr[i] : 100000;
+            rows.push({
+              date: new Date(tArr[i] * 1000).toISOString().slice(0, 10),
+              open: o,
+              high: h,
+              low: l,
+              close: c,
+              volume: v
+            });
+          }
+          return rows.length >= 15 ? rows : null;
+        };
+
+        // Helper: Patch latest intraday real-time matched price from TCBS / SSI / VNDirect quote API
+        const enrichLatestIntradayQuote = async (rows) => {
+          if (!rows || !rows.length) return rows;
+          const quoteUrls = [
+            `https://apipubaws.tcbs.com.vn/tcanalysis/v1/ticker/${encodeURIComponent(ticker)}/overview`,
+            `https://finfo-api.vndirect.com.vn/v4/stock_prices?sort=date&q=code:${encodeURIComponent(ticker)}&size=2`
+          ];
+          for (const qUrl of quoteUrls) {
+            const qTxt = await fetchViaGasOrProxy(qUrl);
+            if (!qTxt) continue;
+            try {
+              const parsed = JSON.parse(qTxt);
+              // VNDirect finfo-api v4 format
+              if (Array.isArray(parsed?.data) && parsed.data[0]?.close) {
+                const d0 = parsed.data[0];
+                const mult = Number(d0.close) < 500 ? 1000 : 1;
+                const liveClose = Number(d0.close) * mult;
+                const liveOpen = (Number(d0.open) || Number(d0.close)) * mult;
+                const liveHigh = (Number(d0.high) || Number(d0.close)) * mult;
+                const liveLow = (Number(d0.low) || Number(d0.close)) * mult;
+                const dDate = String(d0.date || '').slice(0, 10);
+                if (liveClose > 0) {
+                  if (dDate && rows[rows.length - 1].date === dDate) {
+                    rows[rows.length - 1] = {
+                      ...rows[rows.length - 1],
+                      open: liveOpen,
+                      high: liveHigh,
+                      low: liveLow,
+                      close: liveClose
+                    };
+                  } else if (dDate) {
+                    rows.push({
+                      date: dDate,
+                      open: liveOpen,
+                      high: liveHigh,
+                      low: liveLow,
+                      close: liveClose,
+                      volume: Number(d0.nmVolume) || rows[rows.length - 1].volume
+                    });
+                  }
+                  return rows;
+                }
+              }
+            } catch (_) {}
+          }
+          return rows;
+        };
+
         // 1. DNSE Entrade OHLC API
         const dnseUrl = `https://services.entrade.com.vn/chart-api/v2/ohlcs/stock?from=${fromTs}&to=${toTs}&symbol=${encodeURIComponent(ticker)}&resolution=1D`;
         const txt = await fetchViaGasOrProxy(dnseUrl);
         if (txt) {
           try {
             const data = JSON.parse(txt);
-            if (data && Array.isArray(data.t) && data.t.length >= 20) {
-              const rows = [];
-              const lastRaw = data.c[data.c.length - 1];
-              const multiplier = lastRaw < 1000 ? 1000 : 1;
-              for (let i = 0; i < data.t.length; i++) {
-                const c = data.c[i] * multiplier;
-                if (!Number.isFinite(c) || c <= 0) continue;
-                rows.push({
-                  date: new Date(data.t[i] * 1000).toISOString().slice(0, 10),
-                  open: (data.o[i] || data.c[i]) * multiplier,
-                  high: (data.h[i] || data.c[i]) * multiplier,
-                  low: (data.l[i] || data.c[i]) * multiplier,
-                  close: c,
-                  volume: data.v[i] || 100000
-                });
+            if (data && Array.isArray(data.t) && Array.isArray(data.c)) {
+              const rows = normalizeVnSeries(data.t, data.o, data.h, data.l, data.c, data.v);
+              if (rows) {
+                const enriched = await enrichLatestIntradayQuote(rows);
+                return { rows: enriched, provider: 'DNSE Entrade & VNDirect Live' };
               }
-              if (rows.length >= 20) return rows;
             }
           } catch (_) {}
         }
@@ -841,23 +942,71 @@
         if (vndTxt) {
           try {
             const data = JSON.parse(vndTxt);
-            if (data && Array.isArray(data.t) && data.t.length >= 20) {
-              const rows = [];
-              const lastRaw = data.c[data.c.length - 1];
-              const multiplier = lastRaw < 1000 ? 1000 : 1;
-              for (let i = 0; i < data.t.length; i++) {
-                const c = data.c[i] * multiplier;
-                if (!Number.isFinite(c) || c <= 0) continue;
-                rows.push({
-                  date: new Date(data.t[i] * 1000).toISOString().slice(0, 10),
-                  open: (data.o[i] || data.c[i]) * multiplier,
-                  high: (data.h[i] || data.c[i]) * multiplier,
-                  low: (data.l[i] || data.c[i]) * multiplier,
-                  close: c,
-                  volume: data.v[i] || 100000
-                });
+            if (data && Array.isArray(data.t) && Array.isArray(data.c)) {
+              const rows = normalizeVnSeries(data.t, data.o, data.h, data.l, data.c, data.v);
+              if (rows) {
+                const enriched = await enrichLatestIntradayQuote(rows);
+                return { rows: enriched, provider: 'VNDirect DChart HOSE/HNX Live' };
               }
-              if (rows.length >= 20) return rows;
+            }
+          } catch (_) {}
+        }
+
+        // 3. TCBS Stock Bars API Fallback
+        const tcbsUrl = `https://apipubaws.tcbs.com.vn/stock-insight/v1/stock/bars-long-term?ticker=${encodeURIComponent(ticker)}&type=stock&resolution=D&from=${fromTs}&to=${toTs}`;
+        const tcbsTxt = await fetchViaGasOrProxy(tcbsUrl);
+        if (tcbsTxt) {
+          try {
+            const parsed = JSON.parse(tcbsTxt);
+            const list = parsed?.data;
+            if (Array.isArray(list) && list.length >= 15) {
+              const sampleClose = Number(list[list.length - 1]?.close || 0);
+              const mult = sampleClose > 0 && sampleClose < 500 ? 1000 : 1;
+              const rows = list.map((item) => ({
+                date: String(item.tradingDate || '').slice(0, 10),
+                open: Number(item.open || item.close) * mult,
+                high: Number(item.high || item.close) * mult,
+                low: Number(item.low || item.close) * mult,
+                close: Number(item.close) * mult,
+                volume: Number(item.volume) || 100000
+              })).filter((r) => r.date && Number.isFinite(r.close) && r.close > 0);
+              if (rows.length >= 15) {
+                return { rows, provider: 'TCBS Techcom Securities Live' };
+              }
+            }
+          } catch (_) {}
+        }
+
+        // 4. CafeF Historical JSON Fallback
+        const cafefUrl = `https://cafef.vn/du-lieu/Ajax/PageNew/DataHistory/PriceHistory.ashx?Symbol=${encodeURIComponent(ticker)}&StartDate=&EndDate=&PageIndex=1&PageSize=260`;
+        const cfTxt = await fetchViaGasOrProxy(cafefUrl);
+        if (cfTxt) {
+          try {
+            const parsed = JSON.parse(cfTxt);
+            const list = parsed?.Data?.Data;
+            if (Array.isArray(list) && list.length >= 15) {
+              const ordered = [...list].reverse();
+              const rows = ordered.map((item) => {
+                const rawC = parseFloat(String(item.GiaDongCua ?? item.GiaDieuChinh ?? 0).replace(/,/g, ''));
+                const rawO = parseFloat(String(item.GiaMoCua ?? rawC).replace(/,/g, ''));
+                const rawH = parseFloat(String(item.GiaCaoNhat ?? rawC).replace(/,/g, ''));
+                const rawL = parseFloat(String(item.GiaThapNhat ?? rawC).replace(/,/g, ''));
+                const vol = parseFloat(String(item.KhoiLuongKhopLenh ?? 100000).replace(/,/g, '')) || 100000;
+                const mult = rawC > 0 && rawC < 500 ? 1000 : 1;
+                const parts = String(item.Ngay || '').split('/');
+                const isoDate = parts.length === 3
+                  ? `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`
+                  : new Date().toISOString().slice(0, 10);
+                return {
+                  date: isoDate,
+                  open: (Number.isFinite(rawO) ? rawO : rawC) * mult,
+                  high: (Number.isFinite(rawH) ? rawH : rawC) * mult,
+                  low: (Number.isFinite(rawL) ? rawL : rawC) * mult,
+                  close: rawC * mult,
+                  volume: vol
+                };
+              }).filter((r) => Number.isFinite(r.close) && r.close > 0);
+              if (rows.length >= 15) return { rows, provider: 'CafeF Dữ liệu Lịch sử Live' };
             }
           } catch (_) {}
         }
@@ -951,8 +1100,8 @@
           const yahooCrypto = await fetchYahooFinanceChart(cleanSym.includes('-') ? cleanSym : `${cleanSym}-USD`);
           if (yahooCrypto) return { rows: yahooCrypto, source: 'Yahoo Finance Crypto Live', live: true };
         } else if (isVietnamStock(cleanSym)) {
-          const dnseRows = await fetchVnStockDnse(cleanSym);
-          if (dnseRows) return { rows: dnseRows, source: 'DNSE / VNDirect HOSE Live', live: true };
+          const vnRes = await fetchVnStockDnse(cleanSym);
+          if (vnRes && vnRes.rows) return { rows: vnRes.rows, source: vnRes.provider, live: true };
           const yahooVn = await fetchYahooFinanceChart(cleanSym);
           if (yahooVn) return { rows: yahooVn, source: 'Yahoo Finance VN Live', live: true };
         } else {
@@ -962,7 +1111,7 @@
 
         return {
           rows: generateDeterministicFallbackData(cleanSym),
-          source: 'Mô phỏng định lượng cục bộ (Offline Fallback)',
+          source: 'Dữ liệu dự phòng cục bộ (Chưa kết nối được API)',
           live: false
         };
       };
@@ -1652,159 +1801,156 @@
       const renderPortalLinks = (sym) => {
         const cleanSym = normalizeAssetSymbol(sym);
         const container = document.getElementById('quickPortalLinks');
-        if (!container) return;
+        const topBar = document.getElementById('liveExchangeLinksBar');
+        const bridgeTitle = document.getElementById('liveBridgeTitle');
 
         const links = [];
         if (isVietnamStock(cleanSym)) {
           const code = cleanSym.replace('.VN', '');
-          links.push({ name: 'FireAnt', url: `https://fireant.vn/ma-chung-khoan/${code}` });
-          links.push({ name: 'CafeF', url: `https://cafef.vn/du-lieu/hose/${code.toLowerCase()}-cophieu.chn` });
-          links.push({ name: 'TradingView', url: `https://www.tradingview.com/symbols/HOSE-${code}/` });
+          if (bridgeTitle) bridgeTitle.textContent = `🇻🇳 Bảng giá trực tiếp mã ${code} tại Việt Nam:`;
+          links.push({ name: 'SSI iBoard', url: `https://iboard.ssi.com.vn/`, badge: 'HOSE/HNX' });
+          links.push({ name: 'VNDirect', url: `https://dstock.vndirect.com.vn/tong-quan/${code}`, badge: 'Phân tích' });
+          links.push({ name: 'FireAnt', url: `https://fireant.vn/ma-chung-khoan/${code}`, badge: 'Khớp lệnh' });
+          links.push({ name: 'CafeF', url: `https://cafef.vn/du-lieu/hose/${code.toLowerCase()}-cophieu.chn`, badge: 'Tin tức' });
+          links.push({ name: 'Simplize', url: `https://simplize.vn/co-phieu/${code}`, badge: 'Định giá' });
+          links.push({ name: 'TradingView VN', url: `https://www.tradingview.com/symbols/HOSE-${code}/`, badge: 'Biểu đồ' });
         } else if (isCryptoSymbol(cleanSym)) {
           const base = cleanSym.split('-')[0];
-          links.push({ name: 'CoinGecko', url: `https://www.coingecko.com/en/coins/${base.toLowerCase()}` });
-          links.push({ name: 'Binance', url: `https://www.binance.com/en/trade/${base}_USDT` });
-          links.push({ name: 'TradingView', url: `https://www.tradingview.com/symbols/${base}USD/` });
+          if (bridgeTitle) bridgeTitle.textContent = `🌐 Bảng giá Crypto trực tiếp ${base}/USDT:`;
+          links.push({ name: 'Binance Spot', url: `https://www.binance.com/vi/trade/${base}_USDT`, badge: 'Sàn chính' });
+          links.push({ name: 'CoinGecko', url: `https://www.coingecko.com/vi/ty_gia/${base.toLowerCase()}`, badge: 'Vốn hóa' });
+          links.push({ name: 'CoinMarketCap', url: `https://coinmarketcap.com/currencies/${base.toLowerCase()}/`, badge: 'Toàn cầu' });
+          links.push({ name: 'TradingView', url: `https://www.tradingview.com/symbols/${base}USDT/`, badge: 'Biểu đồ' });
         } else {
-          links.push({ name: 'Yahoo Finance', url: `https://finance.yahoo.com/quote/${cleanSym}` });
-          links.push({ name: 'TradingView', url: `https://www.tradingview.com/symbols/${cleanSym}/` });
-          links.push({ name: 'MarketWatch', url: `https://www.marketwatch.com/investing/stock/${cleanSym.toLowerCase()}` });
+          if (bridgeTitle) bridgeTitle.textContent = `🇺🇸 Bảng giá Cổ phiếu Mỹ ${cleanSym}:`;
+          links.push({ name: 'Yahoo Finance', url: `https://finance.yahoo.com/quote/${cleanSym}`, badge: 'NASDAQ/NYSE' });
+          links.push({ name: 'TradingView', url: `https://www.tradingview.com/symbols/${cleanSym}/`, badge: 'Biểu đồ' });
+          links.push({ name: 'MarketWatch', url: `https://www.marketwatch.com/investing/stock/${cleanSym.toLowerCase()}`, badge: 'Tin tức' });
+          links.push({ name: 'Seeking Alpha', url: `https://seekingalpha.com/symbol/${cleanSym}`, badge: 'Phân tích' });
         }
 
-        container.innerHTML = links.map((l) => `
-          <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-[11px] font-semibold transition">
-            ${l.name} ↗
-          </a>
-        `).join('');
+        if (container) {
+          container.innerHTML = links.map((l) => `
+            <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-[11px] font-semibold transition">
+              ${l.name} ↗
+            </a>
+          `).join('');
+        }
+
+        if (topBar) {
+          topBar.innerHTML = links.map((l) => `
+            <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white text-[11px] font-semibold transition">
+              <span>${l.name}</span>
+              <span class="text-[9px] opacity-70 font-mono">[${l.badge}]</span>
+              <span>↗</span>
+            </a>
+          `).join('');
+        }
+      };
+
+      const syncSidebarLabels = () => {
+        const cleanSym = normalizeAssetSymbol(state.symbol);
+        state.symbol = cleanSym;
+        const badge = document.getElementById('assetTypeBadge');
+        if (badge) {
+          if (isVietnamStock(cleanSym)) {
+            badge.textContent = 'CP Việt Nam • VND';
+            badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-500/15 text-rose-600 dark:text-rose-400';
+          } else if (isCryptoSymbol(cleanSym)) {
+            badge.textContent = 'Crypto • 365d';
+            badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400';
+          } else {
+            badge.textContent = 'CP Mỹ • 252d';
+            badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-400';
+          }
+        }
+
+        document.querySelectorAll('.preset-btn').forEach((btn) => {
+          const btnSym = normalizeAssetSymbol(btn.dataset.symbol || '');
+          const active = btnSym === cleanSym;
+          const isVnBtn = isVietnamStock(btnSym);
+          btn.classList.remove('bg-blue-600', 'bg-rose-600', 'text-white', 'bg-slate-100', 'dark:bg-slate-800');
+          if (active) {
+            btn.classList.add(isVnBtn ? 'bg-rose-600' : 'bg-blue-600', 'text-white');
+          } else {
+            btn.classList.add('bg-slate-100', 'dark:bg-slate-800');
+          }
+        });
+
+        const csvInput = document.getElementById('googleSheetCsvInput');
+        if (csvInput && !csvInput.value.trim()) {
+          const savedCsv = localStorage.getItem(`mf_csv_${cleanSym}`);
+          if (savedCsv) csvInput.value = savedCsv;
+        }
+      };
+
+      const renderInstantSnapshot = (statusLabel = 'Đang đồng bộ dữ liệu trực tiếp...') => {
+        try {
+          const cleanSym = normalizeAssetSymbol(state.symbol);
+          const seedRows = state.lastRows && state.lastRows.length >= 15
+            ? state.lastRows
+            : generateDeterministicFallbackData(cleanSym);
+          const forecast = runQuantileForecast(seedRows, cleanSym, state.horizon);
+          const consensus = buildInstitutionalConsensus(cleanSym, seedRows[seedRows.length - 1].close);
+          updateDashboardUI(seedRows, forecast, consensus, statusLabel, false);
+        } catch (_) {}
       };
 
       const fetchLiveMarketNews = async (sym) => {
-        const cleanSym = normalizeAssetSymbol(sym);
         const grid = document.getElementById('liveNewsGrid');
         if (!grid) return;
-
+        const cleanSym = normalizeAssetSymbol(sym);
         const query = isVietnamStock(cleanSym)
-          ? `${cleanSym.replace('.VN', '')} cổ phiếu thị trường chứng khoán`
+          ? `cổ phiếu ${cleanSym.replace('.VN', '')} chứng khoán`
           : isCryptoSymbol(cleanSym)
-            ? `${cleanSym.split('-')[0]} crypto bitcoin market news`
-            : `${cleanSym} stock market news`;
+            ? `${cleanSym.split('-')[0]} crypto market`
+            : `${cleanSym} stock news`;
+        const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=vi&gl=VN&ceid=VN:vi`;
 
-        const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=${isVietnamStock(cleanSym) ? 'vi' : 'en-US'}&gl=${isVietnamStock(cleanSym) ? 'VN' : 'US'}&ceid=${isVietnamStock(cleanSym) ? 'VN:vi' : 'US:en'}`;
-        const xmlText = await fetchViaGasOrProxy(rssUrl);
-
-        let articles = [];
-        if (xmlText) {
-          try {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(xmlText, 'text/xml');
-            const items = Array.from(doc.querySelectorAll('item')).slice(0, 6);
-            articles = items.map((it) => ({
-              title: (it.querySelector('title')?.textContent || '').replace(/\s+-\s+[^-]+$/, ''),
-              source: it.querySelector('source')?.textContent || 'Google News',
-              pubDate: it.querySelector('pubDate')?.textContent || '',
-              link: it.querySelector('link')?.textContent || '#'
-            })).filter((a) => a.title);
-          } catch (_) {}
-        }
-
-        if (!articles.length) {
-          articles = [
-            {
-              title: `Cập nhật biến động giá & dòng tiền tổ chức quanh ${cleanSym}`,
-              source: 'Market Desk',
-              pubDate: 'Vừa cập nhật',
-              link: `https://www.google.com/search?q=${encodeURIComponent(cleanSym + ' market news')}`
-            },
-            {
-              title: `Phân tích vùng hỗ trợ, kháng cự & kịch bản xác suất cho ${cleanSym}`,
-              source: 'Quant Research',
-              pubDate: 'Hôm nay',
-              link: `https://www.tradingview.com/symbols/${cleanSym.replace('-', '')}/`
-            },
-            {
-              title: `Tổng hợp nhận định giá mục tiêu từ các quỹ và công ty phân tích`,
-              source: 'Consensus Feed',
-              pubDate: 'Trực tiếp',
-              link: `https://finance.yahoo.com/quote/${cleanSym}`
-            }
-          ];
-        }
-
-        grid.innerHTML = articles.map((art) => {
-          let timeLabel = art.pubDate;
-          if (art.pubDate && !Number.isNaN(Date.parse(art.pubDate))) {
-            timeLabel = new Date(art.pubDate).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' • ' +
-              new Date(art.pubDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+        let items = [];
+        try {
+          const xmlTxt = await fetchViaGasOrProxy(rssUrl);
+          if (xmlTxt && xmlTxt.includes('<item>')) {
+            const doc = new DOMParser().parseFromString(xmlTxt, 'text/xml');
+            const nodes = Array.from(doc.querySelectorAll('item')).slice(0, 6);
+            items = nodes.map((n) => ({
+              title: n.querySelector('title')?.textContent?.trim() || '',
+              link: n.querySelector('link')?.textContent?.trim() || '#',
+              pubDate: n.querySelector('pubDate')?.textContent?.trim() || '',
+              source: n.querySelector('source')?.textContent?.trim() || 'Google News'
+            })).filter((it) => it.title);
           }
+        } catch (_) {}
+
+        if (!items.length) {
+          const code = cleanSym.replace('.VN', '');
+          items = isVietnamStock(cleanSym)
+            ? [
+                { title: `Theo dõi diễn biến khớp lệnh & dòng tiền khối ngoại mã ${code} trên HOSE/HNX`, link: `https://fireant.vn/ma-chung-khoan/${code}`, pubDate: 'Trực tiếp', source: 'FireAnt' },
+                { title: `Báo cáo tài chính, định giá P/E, P/B và tin tức doanh nghiệp ${code}`, link: `https://dstock.vndirect.com.vn/tong-quan/${code}`, pubDate: 'Trực tiếp', source: 'VNDirect' },
+                { title: `Lịch sử giao dịch, cổ tức và thông tin công bố mới nhất của ${code}`, link: `https://cafef.vn/du-lieu/hose/${code.toLowerCase()}-cophieu.chn`, pubDate: 'Trực tiếp', source: 'CafeF' }
+              ]
+            : [
+                { title: `Biểu đồ kỹ thuật thời gian thực & chỉ báo phân tích cho ${cleanSym}`, link: `https://www.tradingview.com/symbols/${cleanSym.replace('-', '')}/`, pubDate: 'Trực tiếp', source: 'TradingView' },
+                { title: `Tổng hợp dữ liệu thị trường & hồ sơ tài chính ${cleanSym}`, link: `https://finance.yahoo.com/quote/${cleanSym}`, pubDate: 'Trực tiếp', source: 'Yahoo Finance' },
+                { title: `Tin tức vĩ mô và biến động thanh khoản mới nhất của ${cleanSym}`, link: `https://www.google.com/search?q=${encodeURIComponent(cleanSym + ' market news')}`, pubDate: 'Trực tiếp', source: 'Market Hub' }
+              ];
+        }
+
+        grid.innerHTML = items.map((it) => {
+          const timeLabel = it.pubDate && it.pubDate !== 'Trực tiếp'
+            ? new Date(it.pubDate).toLocaleDateString('vi-VN')
+            : 'Cập nhật mới nhất';
           return `
-            <a href="${art.link}" target="_blank" rel="noopener noreferrer" class="group p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-blue-500/10 border border-slate-200/70 dark:border-slate-700/70 hover:border-blue-500/40 transition flex flex-col justify-between gap-2">
-              <h4 class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-500 line-clamp-2 leading-snug">${art.title}</h4>
-              <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                <span class="truncate max-w-[60%] text-blue-500 font-sans font-semibold">${art.source}</span>
+            <a href="${it.link}" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 flex flex-col justify-between gap-2 transition">
+              <div class="text-xs font-semibold text-slate-800 dark:text-slate-100 line-clamp-2 leading-snug">${it.title}</div>
+              <div class="flex items-center justify-between text-[10px] text-slate-400">
+                <span class="font-semibold text-blue-500">${it.source}</span>
                 <span>${timeLabel} ↗</span>
               </div>
             </a>
           `;
         }).join('');
-      };
-
-      // =========================================================================
-      // 8. PIPELINE & AUTO-REFRESH CONTROLLER
-      // =========================================================================
-      const syncSidebarLabels = () => {
-        try {
-          const input = document.getElementById('symbolInput');
-          const sym = normalizeAssetSymbol((input && input.value) ? input.value : 'BTC-USD');
-          if (input && input.value.trim() && input.value.toUpperCase().trim() !== sym) {
-            input.value = sym;
-          }
-          state.symbol = sym;
-          const badge = document.getElementById('assetTypeBadge');
-          if (badge) {
-            if (isCryptoSymbol(sym)) {
-              badge.textContent = 'Crypto • 365d';
-              badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400';
-            } else if (isVietnamStock(sym)) {
-              badge.textContent = 'CP Việt Nam • 252d';
-              badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-500/15 text-rose-600 dark:text-rose-400';
-            } else {
-              badge.textContent = 'Cổ phiếu • 252d';
-              badge.className = 'px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-400';
-            }
-          }
-
-          document.querySelectorAll('.preset-btn').forEach((btn) => {
-            const active = btn.dataset.symbol === sym;
-            btn.className = active
-              ? 'preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-blue-600 text-white transition cursor-pointer'
-              : 'preset-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer';
-          });
-
-          try {
-            const savedCsv = localStorage.getItem(`mf_csv_${sym}`) || '';
-            const csvInput = document.getElementById('googleSheetCsvInput');
-            if (csvInput && csvInput.value !== savedCsv) {
-              csvInput.value = savedCsv;
-            }
-          } catch (_) {}
-        } catch (_) {}
-      };
-
-      const renderInstantSnapshot = (sourceLabel = 'Đang đồng bộ dữ liệu trực tiếp...') => {
-        try {
-          syncSidebarLabels();
-          const sym = state.symbol || 'BTC-USD';
-          const hor = state.horizon || '1m';
-          const instantRows = generateDeterministicFallbackData(sym);
-          const instantForecast = runQuantileForecast(instantRows, sym, hor);
-          const instantConsensus = buildInstitutionalConsensus(sym, instantRows[instantRows.length - 1].close);
-          state.lastRows = instantRows;
-          state.lastForecast = instantForecast;
-          updateDashboardUI(instantRows, instantForecast, instantConsensus, sourceLabel, false);
-          renderPortalLinks(sym);
-        } catch (e) {
-          showBanner(`Đang khởi tạo giao diện: ${e && e.message ? e.message : e}`, 'warn');
-        }
       };
 
       const executeForecastPipeline = async (silent = false) => {
@@ -1877,70 +2023,19 @@
       // =========================================================================
       // 9. THEME, MODAL & PUBLISH / DOWNLOAD / COPY HANDLERS
       // =========================================================================
-      document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
-        const html = document.documentElement;
-        html.classList.toggle('dark');
-        if (state.lastRows.length && state.lastForecast) {
-          const consensus = buildInstitutionalConsensus(state.symbol, state.lastRows[state.lastRows.length - 1].close);
-          renderFanChart(state.lastRows, state.lastForecast, consensus, state.symbol);
-        }
-      });
-
-      document.querySelectorAll('.preset-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const input = document.getElementById('symbolInput');
-          if (input) input.value = btn.dataset.symbol;
-          executeForecastPipeline(false);
-        });
-      });
-
-      document.getElementById('symbolInput')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') executeForecastPipeline(false);
-      });
-
-      document.getElementById('horizonSelect')?.addEventListener('change', (e) => {
-        state.horizon = e.target.value;
-        executeForecastPipeline(false);
-      });
-
-      document.getElementById('autoRefreshToggle')?.addEventListener('change', (e) => {
-        state.autoRefresh = e.target.checked;
-        restartAutoRefreshTimer();
-      });
-
-      document.getElementById('refreshIntervalSelect')?.addEventListener('change', (e) => {
-        state.refreshSeconds = parseInt(e.target.value, 10) || 30;
-        restartAutoRefreshTimer();
-      });
-
-      document.getElementById('runForecastBtn')?.addEventListener('click', () => executeForecastPipeline(false));
-      document.getElementById('refreshNowBtn')?.addEventListener('click', () => executeForecastPipeline(false));
-      document.getElementById('closeBannerBtn')?.addEventListener('click', () => {
-        document.getElementById('statusBanner')?.classList.add('hidden');
-      });
-
-      const installModal = document.getElementById('installAppModal');
-      const openInstallModal = () => {
-        if (!installModal) return;
-        installModal.classList.remove('hidden');
-        installModal.classList.add('flex');
-        const badge = document.getElementById('protocolStatusBadge');
-        if (badge) {
-          badge.textContent = window.location.protocol === 'https:' ? 'HTTPS Ready' : window.location.protocol;
-        }
+      const copyTextViaExecCommand = (text) => {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        } catch (_) {}
       };
-      const closeInstallModal = () => {
-        if (!installModal) return;
-        installModal.classList.add('hidden');
-        installModal.classList.remove('flex');
-      };
-
-      document.getElementById('openInstallModalBtn')?.addEventListener('click', openInstallModal);
-      document.getElementById('closeInstallModalBtn')?.addEventListener('click', closeInstallModal);
-      document.getElementById('doneInstallModalBtn')?.addEventListener('click', closeInstallModal);
-      installModal?.addEventListener('click', (e) => {
-        if (e.target === installModal) closeInstallModal();
-      });
 
       const buildCleanAppHtml = () => {
         const docClone = document.documentElement.cloneNode(true);
@@ -1964,29 +2059,6 @@
         fb.classList.add(isError ? 'text-amber-500' : 'text-emerald-600', 'dark:text-emerald-400');
       };
 
-      const copyTextViaExecCommand = (txt) => {
-        try {
-          if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-            navigator.clipboard.writeText(txt).catch(() => {});
-          }
-        } catch (_) {}
-        const helperTa = document.createElement('textarea');
-        helperTa.value = txt;
-        helperTa.setAttribute('readonly', '');
-        helperTa.style.position = 'fixed';
-        helperTa.style.left = '-9999px';
-        document.body.appendChild(helperTa);
-        helperTa.select();
-        let ok = false;
-        try {
-          ok = document.execCommand('copy');
-        } catch (_) {
-          ok = false;
-        }
-        document.body.removeChild(helperTa);
-        return ok;
-      };
-
       const showFallbackCodeBox = (htmlContent) => {
         const wrap = document.getElementById('fallbackCodeBoxWrap');
         const ta = document.getElementById('fallbackCodeTextarea');
@@ -1998,13 +2070,101 @@
         }
       };
 
-      document.getElementById('selectAllFallbackBtn')?.addEventListener('click', () => {
-        const ta = document.getElementById('fallbackCodeTextarea');
-        if (ta) {
-          ta.focus();
-          ta.select();
-          document.execCommand('copy');
-          setInstallFeedback('✓ Đã chọn toàn bộ và copy mã!');
+      document.getElementById('openInstallModalBtn')?.addEventListener('click', () => {
+        const modal = document.getElementById('installAppModal');
+        const protoBadge = document.getElementById('protocolStatusBadge');
+        if (protoBadge) protoBadge.textContent = window.location.protocol || 'https:';
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+      });
+
+      const closeInstallModal = () => {
+        const modal = document.getElementById('installAppModal');
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      };
+
+      document.getElementById('closeInstallModalBtn')?.addEventListener('click', closeInstallModal);
+      document.getElementById('doneInstallModalBtn')?.addEventListener('click', closeInstallModal);
+      document.getElementById('closeBannerBtn')?.addEventListener('click', () => {
+        document.getElementById('statusBanner')?.classList.add('hidden');
+      });
+
+      document.getElementById('runForecastBtn')?.addEventListener('click', () => {
+        const input = document.getElementById('symbolInput');
+        if (input && input.value.trim()) {
+          state.symbol = normalizeAssetSymbol(input.value);
+          input.value = state.symbol;
+        }
+        executeForecastPipeline(false);
+      });
+
+      document.getElementById('refreshNowBtn')?.addEventListener('click', () => {
+        executeForecastPipeline(false);
+      });
+
+      document.getElementById('horizonSelect')?.addEventListener('change', (e) => {
+        state.horizon = e.target.value || '1m';
+        executeForecastPipeline(false);
+      });
+
+      document.getElementById('autoRefreshToggle')?.addEventListener('change', (e) => {
+        state.autoRefresh = Boolean(e.target.checked);
+        restartAutoRefreshTimer();
+      });
+
+      document.getElementById('refreshIntervalSelect')?.addEventListener('change', (e) => {
+        state.refreshSeconds = Math.max(10, parseInt(e.target.value, 10) || 30);
+        restartAutoRefreshTimer();
+      });
+
+      document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
+        const html = document.documentElement;
+        html.classList.toggle('dark');
+        if (state.lastRows.length && state.lastForecast) {
+          const consensus = buildInstitutionalConsensus(state.symbol, state.lastRows[state.lastRows.length - 1].close);
+          renderFanChart(state.lastRows, state.lastForecast, consensus, state.symbol);
+        }
+      });
+
+      document.querySelectorAll('.preset-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const symVal = (btn.dataset.symbol || 'BTC-USD').toUpperCase().trim();
+          const input = document.getElementById('symbolInput');
+          if (input) input.value = symVal;
+          state.symbol = normalizeAssetSymbol(symVal);
+          executeForecastPipeline(false);
+        });
+      });
+
+      document.getElementById('swapSymbolBtn')?.addEventListener('click', () => {
+        const input = document.getElementById('symbolInput');
+        const nextSym = isVietnamStock(state.symbol) ? 'BTC-USD' : 'MBB.VN';
+        if (input) input.value = nextSym;
+        state.symbol = normalizeAssetSymbol(nextSym);
+        executeForecastPipeline(false);
+      });
+
+      document.getElementById('symbolInput')?.addEventListener('change', (e) => {
+        const raw = (e.target.value || '').trim();
+        if (raw) {
+          state.symbol = normalizeAssetSymbol(raw);
+          e.target.value = state.symbol;
+          executeForecastPipeline(false);
+        }
+      });
+
+      document.getElementById('symbolInput')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const raw = (e.target.value || '').trim();
+          state.symbol = normalizeAssetSymbol(raw || 'BTC-USD');
+          e.target.value = state.symbol;
+          executeForecastPipeline(false);
         }
       });
 
